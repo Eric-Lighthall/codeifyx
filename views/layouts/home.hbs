@@ -12,10 +12,26 @@
 </head>
 <body>
     {{> _header}}
-    <div class="container vh-100 overflow-hidden">
+    <div class="container mt-5">
         {{{body}}}
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let options = {
+        strings: ['Streamline Coding', 'Ease Debugging', 'Enhance Productivity'],
+        typeSpeed: 70,
+        backSpeed: 30,
+        backDelay: 2000,
+        startDelay: 2000,
+        loop: true,
+        showCursor: false,
+        };
+
+        let typedText = new Typed('#typed-text', options);
+    });
+    </script>
 </body>
 </html>

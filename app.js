@@ -24,7 +24,18 @@ if (process.env.NODE_ENV === 'development') {
 }
 
 // Handlebars
-app.engine('.hbs', exphbs.engine({defaultLayout: 'main', extname: '.hbs'}));
+const hbs = exphbs.create({
+    defaultLayout: 'main',
+    extname: '.hbs',
+});
+  
+// Register Handlebars helpers
+hbs.handlebars.registerHelper('eq', function (a, b) {
+    return a === b;
+});
+
+// Handlebars
+app.engine('.hbs', exphbs.engine({ defaultLayout: 'main', extname: '.hbs' }));
 app.set('view engine', '.hbs');
 app.set('views', './views');
 

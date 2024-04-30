@@ -7,3 +7,42 @@ p {
     margin-top: 50px;
     text-align: center;
 }
+
+body {
+    background-color: #11121c;
+}
+
+.bg-transparent {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.navbar-nav .nav-item {
+    margin: 0 0.75rem;
+}
+
+.navbar-nav .nav-link.active {
+    color: #ffc107;
+}
+
+.main-text {
+    font-size: 48px;
+    font-weight: bold;
+}
+
+#typed-text {
+    background: linear-gradient(to bottom right, #e69f57, #e0727a, #bd3fb1);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
+    padding-bottom: 0.2em;
+    line-height: 1.2;
+}
+
+@media (min-width: 992px) {
+    .navbar-nav.mx-auto {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+}
