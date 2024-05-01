@@ -35,6 +35,9 @@ p {
     align-items: center;
     margin-bottom: 15px;
 }
+a.login-option {
+    text-decoration: none;
+}
 .login-option img {
     width: 20px;
     height: 20px;
@@ -51,6 +54,7 @@ p {
 
 body {
     background-color: #11121c;
+    color: white;
     /* background: url(/images/Pixel_grid_4000x2000.svg.png) rgba(0, 0, 0, 0.7);
     background-position: center;
     background-size: cover; */
@@ -163,3 +167,28 @@ body {
     padding: 0 10px;
     font-size: 0.9rem;
 }
+
+.profile-info {
+    margin-top: 20px;
+  }
+  
+  .dropdown {
+    margin-top: 20px;
+  }
+  
+  .chat-bar-container {
+    position: fixed;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    padding: 0 20px;
+  }
+  
+  .chat-bar {
+    max-width: 100%;
+    margin: 0 auto;
+  }
+  
+  .chat-bar input {
+    border-radius: 5px;
+  }
