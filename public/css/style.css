@@ -1,15 +1,59 @@
+.mt-6 {
+    margin-top: 6rem !important;
+}
+
 p {
     margin: 10px 0 !important;
 }
 
-.login-container {
-    width: 400px;
-    margin-top: 50px;
-    text-align: center;
+.card {
+    background-color: transparent;
+    border: none;
+}
+
+.form-control {
+    height: 55px;
+    border: 1px solid grey;
+    color: #fff;
+    background-color: transparent;
+}
+
+.form-control:focus {
+    background-color: transparent;
+    box-shadow: none;
+    border-color: white;
+}
+.form-control::placeholder {
+    color: #ccc;
+}
+.login-option {
+    background-color: #1e1e2d;
+    border-radius: 5px;
+    padding: 15px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.login-option img {
+    width: 20px;
+    height: 20px;
+    margin-right: 10px;
+}
+.login-option span {
+    color: #fff;
+    font-weight: bold;
+}
+.custom-row {
+    min-width: 350px;
+    margin: 0 auto;
 }
 
 body {
     background-color: #11121c;
+    /* background: url(/images/Pixel_grid_4000x2000.svg.png) rgba(0, 0, 0, 0.7);
+    background-position: center;
+    background-size: cover; */
 }
 
 .bg-transparent {
@@ -25,7 +69,7 @@ body {
 }
 
 .main-text {
-    font-size: 48px;
+    font-size: 4rem;
     font-weight: bold;
 }
 
@@ -39,10 +83,83 @@ body {
     line-height: 1.2;
 }
 
+.typed-text-placeholder {
+    min-height: 1.4em;
+}
+
+.text-slightly-gray {
+    color: rgba(255, 255, 255, 0.7);
+}
+
 @media (min-width: 992px) {
     .navbar-nav.mx-auto {
         position: absolute;
         left: 50%;
         transform: translateX(-50%);
     }
+}
+
+.transparent-card {
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+  }
+  
+  .custom-input {
+    border-radius: 20px;
+    padding: 10px 20px;
+    border: 1px solid #ccc;
+  }
+  
+  .custom-input:focus {
+    border-color: #ccc;
+    box-shadow: none;
+  }
+  
+  .password-group {
+    position: relative;
+  }
+  
+  .toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+  }
+
+.btn-lg {
+    width: 100%;
+    font-size: 1rem;
+    height: 52px;
+}
+
+.or-separator {
+    position: relative;
+    margin: 20px 0;
+}
+
+.or-separator::before,
+.or-separator::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    width: 44%;
+    height: 1px;
+    background-color: #a8a8a8;
+}
+
+.or-separator::before {
+    left: 0;
+}
+
+.or-separator::after {
+    right: 0;
+}
+
+.or-separator span {
+    display: inline-block;
+    background-color: #11121c;
+    padding: 0 10px;
+    font-size: 0.9rem;
 }
