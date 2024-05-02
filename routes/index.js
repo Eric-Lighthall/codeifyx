@@ -21,6 +21,15 @@ router.get('/login', ensureGuest, (req, res) => {
   });
 });
 
+// @desc    Signup page
+// @route   GET /signup
+router.get('/signup', ensureGuest, (req, res) => {
+  res.render('signup', {
+    layout: 'login',
+    activeLink: 'home',
+  });
+});
+
 // @desc    Dashboard
 // @route   GET /dashboard
 router.get('/chat', ensureAuth, (req, res) => {
@@ -37,6 +46,7 @@ router.get('/chat', ensureAuth, (req, res) => {
 router.post('/api/chat', ensureAuth, async (req, res) => {
   try {
     const message = req.body.message;
+    
     sendMessage(message, res);
   } catch (error) {
     console.error('Error:', error);

@@ -22,6 +22,7 @@ p {
     background-color: transparent;
     box-shadow: none;
     border-color: white;
+    color: white;
 }
 .form-control::placeholder {
     color: #ccc;
@@ -48,7 +49,7 @@ a.login-option {
     font-weight: bold;
 }
 .custom-row {
-    min-width: 350px;
+    width: 350px;
     margin: 0 auto;
 }
 
@@ -107,30 +108,30 @@ body {
     background-color: transparent;
     border: none;
     box-shadow: none;
-  }
-  
-  .custom-input {
+}
+
+.custom-input {
     border-radius: 20px;
     padding: 10px 20px;
     border: 1px solid #ccc;
-  }
-  
-  .custom-input:focus {
+}
+
+.custom-input:focus {
     border-color: #ccc;
     box-shadow: none;
-  }
-  
-  .password-group {
+}
+
+.password-group {
     position: relative;
-  }
-  
-  .toggle-password {
+}
+
+.toggle-password {
     position: absolute;
     top: 50%;
     right: 10px;
     transform: translateY(-50%);
     cursor: pointer;
-  }
+}
 
 .btn-lg {
     width: 100%;
@@ -170,25 +171,25 @@ body {
 
 .profile-info {
     margin-top: 20px;
-  }
-  
-  .dropdown {
+}
+
+.dropdown {
     margin-top: 20px;
-  }
-  
-  .chat-bar-container {
-    position: fixed;
+}
+
+.chat-bar-container {
+    position: absolute;
     bottom: 20px;
     left: 0;
     right: 0;
     padding: 0 20px;
-  }
-  
-  .chat-bar {
+}
+
+.chat-bar {
     max-width: 100%;
     margin: 0 auto;
-  }
-  
-  .chat-bar input {
+}
+
+.chat-bar input {
     border-radius: 5px;
-  }
+}

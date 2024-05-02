@@ -8,6 +8,7 @@ const passport = require('passport');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const connectDB = require('./config/db');
+const bodyParser = require('body-parser');
 
 // Load config
 dotenv.config({ path: './config/config.env' });
@@ -19,6 +20,8 @@ connectDB();
 
 const app = express();
 
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 app.use(express.json());
 
 if (process.env.NODE_ENV === 'development') {
