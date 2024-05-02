@@ -2,13 +2,19 @@ const express = require('express');
 const router = express.Router();
 const { ensureAuth, ensureGuest } = require('../middleware/auth');
 const sendMessage = require('../services/llamaApi');
+const User = require('../models/User');
 
 // @desc    Landing page
 // @route   GET /
 router.get('/', (req, res) => {
+  const user = req.user;
+  const homeUser = {
+    displayName: user.displayName
+  }
   res.render('home', {
     layout: 'home',
     activeLink: 'home',
+    user: homeUser,
   });
 });
 
@@ -32,13 +38,24 @@ router.get('/signup', ensureGuest, (req, res) => {
 
 // @desc    Dashboard
 // @route   GET /dashboard
-router.get('/chat', ensureAuth, (req, res) => {
-  res.render('chat', {
-    layout: 'chat',
-    name: req.user.firstName,
-    activeLink: 'home',
-    messages: [],
-  });
+router.get('/chat', ensureAuth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    const chatUser = {
+      displayName: user.displayName,
+      image: user.image,
+    };
+    res.render('chat', {
+      layout: 'chat',
+      activeLink: 'home',
+      messages: [],
+      user: chatUser,
+    });
+  }
+  catch (error) {
+    console.error('Error fetching user data:', error);
+    res.redirect('/login');
+  }
 });
 
 // @desc    Chat API

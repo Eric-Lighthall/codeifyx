@@ -55,6 +55,15 @@ a.login-option {
 
 body {
     background-color: #11121c;
+    /* background: hsla(29, 31%, 35%, 1);
+
+    background: radial-gradient(circle, hsla(29, 31%, 35%, 1) 0%, hsla(309, 25%, 26%, 1) 41%, hsla(235, 24%, 9%, 1) 100%);
+
+    background: -moz-radial-gradient(circle, hsla(29, 31%, 35%, 1) 0%, hsla(309, 25%, 26%, 1) 41%, hsla(235, 24%, 9%, 1) 100%);
+
+    background: -webkit-radial-gradient(circle, hsla(29, 31%, 35%, 1) 0%, hsla(309, 25%, 26%, 1) 41%, hsla(235, 24%, 9%, 1) 100%);
+
+    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#75583D", endColorstr="#52314D", GradientType=1 ); */
     color: white;
     /* background: url(/images/Pixel_grid_4000x2000.svg.png) rgba(0, 0, 0, 0.7);
     background-position: center;
@@ -192,4 +201,9 @@ body {
 
 .chat-bar input {
     border-radius: 5px;
+}
+
+.card-title {
+    font-size: 2.1rem;
+    font-weight: bold;
 }

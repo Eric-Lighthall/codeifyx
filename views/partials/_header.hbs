@@ -1,21 +1,22 @@
 {{!-- <nav class="grey darken-3">
-    <div class="nav-wrapper container">
-        <a href="#!" class="brand-logo center">Codeifyx</a>
-        <a href="#!" data-target="mobile-demo" class="sidenav-trigger show-on-large"><i class="fas fa-bars"></i></a>
-        <ul class="sidenav" id="mobile-demo">
-            <li><a href="/dashboard">Dashboard</a></li>
-            <li><a href="/login">Login</a></li>
-            <li><a href="/auth/logout">Logout</a></li>
-        </ul>
-    </div>
+  <div class="nav-wrapper container">
+    <a href="#!" class="brand-logo center">Codeifyx</a>
+    <a href="#!" data-target="mobile-demo" class="sidenav-trigger show-on-large"><i class="fas fa-bars"></i></a>
+    <ul class="sidenav" id="mobile-demo">
+      <li><a href="/dashboard">Dashboard</a></li>
+      <li><a href="/login">Login</a></li>
+      <li><a href="/auth/logout">Logout</a></li>
+    </ul>
+  </div>
 </nav> --}}
 <nav class="navbar navbar-expand-lg navbar-dark bg-transparent sticky-top">
   <div class="container">
     <a class="navbar-brand" href="index.html">
-      <img src="/images/Codeifyx.png" height="24" alt="" class="d-inline-block align-text-top d-none d-lg-inline-block">
-      <img src="/images/Codeifyx.png" height="24" alt="" class="d-none d-lg-none d-inline-block">
+      <img src="/images/codeifyxlogo3.webp" height="50" alt="" class="d-inline-block align-text-top d-none d-lg-inline-block">
+      <img src="/images/codeifyxlogo3.webp" height="50" alt="" class="d-none d-lg-none d-inline-block">
     </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+      aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
@@ -34,6 +35,14 @@
         </li>
       </ul>
       <ul class="navbar-nav ms-auto">
+        {{#if user}}
+        <li class="nav-item">
+          <span class="nav-link">Welcome, {{user.displayName}}</span>
+        </li>
+        <li class="nav-item">
+          <a href="/auth/logout" class="nav-link btn btn-warning">Logout</a>
+        </li>
+        {{else}}
         <li class="nav-item">
           <a href="/login" class="nav-link">
             <span class="d-none d-md-inline btn btn-outline-warning me-1">Login</span>
@@ -41,8 +50,9 @@
           </a>
         </li>
         <li class="nav-item d-none d-md-inline-block">
-          <a href="/login" target="_blank" class="nav-link btn btn-warning">Signup</a>
+          <a href="/signup" target="_blank" class="nav-link btn btn-warning">Signup</a>
         </li>
+        {{/if}}
       </ul>
     </div>
   </div>
