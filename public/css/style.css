@@ -1,3 +1,7 @@
+* {
+    font-family: 'Roboto', sans-serif;
+}
+
 .mt-6 {
     margin-top: 6rem !important;
 }
@@ -54,21 +58,25 @@ a.login-option {
 }
 
 body {
-    background-color: #11121c;
-    /* background: hsla(29, 31%, 35%, 1);
-
-    background: radial-gradient(circle, hsla(29, 31%, 35%, 1) 0%, hsla(309, 25%, 26%, 1) 41%, hsla(235, 24%, 9%, 1) 100%);
-
-    background: -moz-radial-gradient(circle, hsla(29, 31%, 35%, 1) 0%, hsla(309, 25%, 26%, 1) 41%, hsla(235, 24%, 9%, 1) 100%);
-
-    background: -webkit-radial-gradient(circle, hsla(29, 31%, 35%, 1) 0%, hsla(309, 25%, 26%, 1) 41%, hsla(235, 24%, 9%, 1) 100%);
-
-    filter: progid: DXImageTransform.Microsoft.gradient( startColorstr="#75583D", endColorstr="#52314D", GradientType=1 ); */
+    background-color: #0F172A;
     color: white;
     /* background: url(/images/Pixel_grid_4000x2000.svg.png) rgba(0, 0, 0, 0.7);
     background-position: center;
     background-size: cover; */
 }
+
+.gradient-container {
+    width: 700px;
+    height: 700px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -60%);
+    background-image: linear-gradient(to top left,rgb(192 38 211 / 0.5), rgb(251 191 36 / 0.5))!important;
+    filter: blur(250px);
+    border-radius: 50%;
+    z-index: -1;
+  }
 
 .bg-transparent {
     background-color: rgba(0, 0, 0, 0.7);
@@ -78,8 +86,14 @@ body {
     margin: 0 0.75rem;
 }
 
-.navbar-nav .nav-link.active {
+.navbar-nav .nav-link.active, .navbar-nav .nav-link:hover {
     color: #ffc107;
+}
+
+.navbar-nav .nav-item a {
+    color: white;
+    font-weight: 500;
+    font-size: 1.1rem;
 }
 
 .main-text {
@@ -142,7 +156,7 @@ body {
     cursor: pointer;
 }
 
-.btn-lg {
+.login-btn {
     width: 100%;
     font-size: 1rem;
     height: 52px;
@@ -206,4 +220,12 @@ body {
 .card-title {
     font-size: 2.1rem;
     font-weight: bold;
+}
+
+#launch-btn {
+    font-weight: bold;
+}
+
+#home {
+    height: 100vh;
 }
