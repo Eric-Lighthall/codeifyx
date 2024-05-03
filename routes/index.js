@@ -7,10 +7,16 @@ const User = require('../models/User');
 // @desc    Landing page
 // @route   GET /
 router.get('/', (req, res) => {
-  const user = req.user;
-  const homeUser = {
-    displayName: user.displayName
+  let homeUser = null;
+
+  if (req.isAuthenticated()) {
+    const user = req.user;
+    homeUser = {
+      displayName: user.displayName,
+      image: user.image,
+    };
   }
+
   res.render('home', {
     layout: 'home',
     activeLink: 'home',
@@ -63,7 +69,7 @@ router.get('/chat', ensureAuth, async (req, res) => {
 router.post('/api/chat', ensureAuth, async (req, res) => {
   try {
     const message = req.body.message;
-    
+
     sendMessage(message, res);
   } catch (error) {
     console.error('Error:', error);
