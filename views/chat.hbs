@@ -1,93 +1,108 @@
 <div class="row">
-  <div class="col-md-6">
-    <div class="dropdown">
-      <button class="btn btn-secondary dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown"
-        aria-expanded="false">
-        Programming Language
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="languageDropdown">
-        <li><a class="dropdown-item" href="#">JavaScript</a></li>
-        <li><a class="dropdown-item" href="#">Python</a></li>
-        <li><a class="dropdown-item" href="#">Java</a></li>
-        <li><a class="dropdown-item" href="#">C++</a></li>
+  <div class="col-md-3 vh-100" id="recent-chats">
+    <div class="recent-chats">
+      <h4>Recent Chats</h4>
+      <ul class="list-group">
+        {{#each recentChats}}
+        <li class="list-group-item">
+          <a href="/chat/{{this.id}}">{{this.title}}</a>
+        </li>
+        {{/each}}
       </ul>
     </div>
   </div>
-  <div class="col-md-6 text-end">
-    <div class="profile-dropdown">
-      <img src="{{user.image}}" alt="Profile Image" class="profile-image" data-bs-toggle="dropdown"
-        aria-expanded="false">
-      <ul class="dropdown-menu dropdown-menu-end">
-        <li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="chat-container">
-    <div class="chat-messages">
-      {{#each messages}}
-      <div class="message {{role}}">
-        <p>{{content}}</p>
+  <div class="col-md-9">
+    <div class="row">
+      <div class="col-md-6">
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle" type="button" id="languageDropdown"
+            data-bs-toggle="dropdown" aria-expanded="false">
+            Programming Language
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+            <li><a class="dropdown-item" href="#">JavaScript</a></li>
+            <li><a class="dropdown-item" href="#">Python</a></li>
+            <li><a class="dropdown-item" href="#">Java</a></li>
+            <li><a class="dropdown-item" href="#">C++</a></li>
+          </ul>
+        </div>
       </div>
-      {{/each}}
+      <div class="col-md-6 text-end">
+        <div class="profile-dropdown">
+          <img src="{{user.image}}" alt="Profile Image" class="profile-image" data-bs-toggle="dropdown"
+            aria-expanded="false">
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
+          </ul>
+        </div>
+      </div>
     </div>
-  </div>
-
-  <div class="chat-bar-container">
-    <div class="chat-bar">
-      <div class="input-group">
-        <input type="text" class="form-control" id="messageInput" placeholder="Type your message..."
-          aria-label="Message">
+    <div class="chat-container">
+      <div class="chat-messages">
+        {{#each messages}}
+        <div class="message {{role}}">
+          <p>{{content}}</p>
+        </div>
+        {{/each}}
+      </div>
+    </div>
+    <div class="chat-bar-container">
+      <div class="chat-bar">
+        <div class="input-group">
+          <input type="text" class="form-control" id="messageInput" placeholder="Type your message..."
+            aria-label="Message">
+        </div>
       </div>
     </div>
   </div>
+</div>
 
-  <script>
-    const chatMessages = document.querySelector('.chat-messages');
-    const messageInput = document.getElementById('messageInput');
+<script>
+  const chatMessages = document.querySelector('.chat-messages');
+  const messageInput = document.getElementById('messageInput');
 
-    messageInput.addEventListener('keypress', async (event) => {
-      if (event.key === 'Enter') {
-        const userMessage = messageInput.value;
-        messageInput.value = '';
-        addMessageToChat('user', userMessage);
+  messageInput.addEventListener('keypress', async (event) => {
+    if (event.key === 'Enter') {
+      const userMessage = messageInput.value;
+      messageInput.value = '';
+      addMessageToChat('user', userMessage);
 
-        try {
-          const response = await fetch('/api/chat', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ message: userMessage }),
-          });
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ message: userMessage }),
+        });
 
-          if (response.ok) {
-            const stream = response.body.pipeThrough(new TextDecoderStream()).getReader();
-            const assistantMessageElement = addMessageToChat('assistant', '');
+        if (response.ok) {
+          const stream = response.body.pipeThrough(new TextDecoderStream()).getReader();
+          const assistantMessageElement = addMessageToChat('assistant', '');
 
-            while (true) {
-              const { done, value } = await stream.read();
-              if (done) break;
+          while (true) {
+            const { done, value } = await stream.read();
+            if (done) break;
 
-              assistantMessageElement.innerHTML += value;
-              chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
-          } else {
-            throw new Error('API request failed');
+            assistantMessageElement.innerHTML += value;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
           }
-        } catch (error) {
-          console.error('Error:', error);
-          addMessageToChat('error', 'Oops! Something went wrong. Please try again.');
+        } else {
+          throw new Error('API request failed');
         }
+      } catch (error) {
+        console.error('Error:', error);
+        addMessageToChat('error', 'Oops! Something went wrong. Please try again.');
       }
-    });
-
-    function addMessageToChat(role, content) {
-      const messageElement = document.createElement('div');
-      messageElement.classList.add('message', role);
-      messageElement.innerHTML = `<p>${content}</p>`;
-      chatMessages.appendChild(messageElement);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-      return messageElement;
     }
-  </script>
+  });
+
+  function addMessageToChat(role, content) {
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message', role);
+    messageElement.innerHTML = `<p>${content}</p>`;
+    chatMessages.appendChild(messageElement);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+    return messageElement;
+  }
+</script>
