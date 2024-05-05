@@ -214,15 +214,11 @@ body {
 }
 
 .chat-bar-container {
-    position: absolute;
-    bottom: 20px;
-    left: 0;
-    right: 0;
-    padding: 0 20px;
+    padding: 20px 0;
 }
 
 .chat-bar {
-    max-width: 100%;
+    width: 100%;
     margin: 0 auto;
 }
 
@@ -257,6 +253,71 @@ body {
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-#recent-chats {
+.fixed-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 80px;
+    transition: width 0.3s ease;
     background-color: rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+#recent-chats:hover {
+    width: 250px;
+}
+
+.offset-md-2 {
+    margin-left: 60px;
+}
+
+.logo {
+    max-width: 200px;
+    height: auto;
+}
+
+.profile-image {
+    width: 40px;
+    height: 40px;
+}
+
+.display-name {
+    color: white;
+    text-decoration: none;
+}
+
+.chat-list,
+.daily-quota,
+.profile .display-name,
+.full-logo {
+    display: none;
+    white-space: nowrap;
+}
+
+.fixed-sidebar:hover .chat-list,
+.fixed-sidebar:hover .daily-quota,
+.fixed-sidebar:hover .profile .display-name,
+.fixed-sidebar:hover .full-logo {
+    display: block;
+}
+
+.logo-container {
+    width: 50px;
+}
+
+.fixed-sidebar:hover .logo-container {
+    width: 200px;
+}
+
+.fixed-sidebar .small-logo {
+    display: block;
+}
+
+.fixed-sidebar:hover .small-logo {
+    display: none;
+}
+
+.w-70 {
+    width: 60%;
 }

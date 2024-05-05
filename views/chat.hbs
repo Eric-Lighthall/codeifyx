@@ -1,56 +1,85 @@
-<div class="row">
-  <div class="col-md-3 vh-100" id="recent-chats">
-    <div class="recent-chats">
-      <h4>Recent Chats</h4>
-      <ul class="list-group">
-        {{#each recentChats}}
-        <li class="list-group-item">
-          <a href="/chat/{{this.id}}">{{this.title}}</a>
-        </li>
-        {{/each}}
-      </ul>
+<div class="row h-100">
+  <div class="col-md-2 fixed-sidebar" id="recent-chats">
+    <div class="recent-chats d-flex flex-column justify-content-between h-100">
+      <div class="text-center mt-3 logo-container">
+        <a href="/">
+          <img src="/images/codeifyxlogosmall.webp" alt="Small Logo" class="small-logo img-fluid">
+          <img src="/images/codeifyxlogo3.webp" alt="Full Logo" class="full-logo img-fluid">
+        </a>
+      </div>
+      <div class="chat-list">
+        <h4>Recent Chats</h4>
+        <ul class="list-group">
+          {{#each recentChats}}
+          <li class="list-group-item">
+            <a href="/chat/{{this.id}}">{{this.title}}</a>
+          </li>
+          {{/each}}
+        </ul>
+      </div>
+      <div class="daily-quota text-center">
+        <p>Used Tokens: {{usedTokens}}</p>
+        <p>Available Tokens: {{availableTokens}}</p>
+      </div>
+      <div class="profile d-flex align-items-center">
+        <img src="{{user.image}}" alt="Profile Image" class="profile-image rounded-circle me-2">
+        <a href="/profile" class="display-name fw-bold">{{user.displayName}}</a>
+      </div>
     </div>
   </div>
-  <div class="col-md-9">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="dropdown">
-          <button class="btn btn-secondary dropdown-toggle" type="button" id="languageDropdown"
-            data-bs-toggle="dropdown" aria-expanded="false">
-            Programming Language
-          </button>
-          <ul class="dropdown-menu" aria-labelledby="languageDropdown">
-            <li><a class="dropdown-item" href="#">JavaScript</a></li>
-            <li><a class="dropdown-item" href="#">Python</a></li>
-            <li><a class="dropdown-item" href="#">Java</a></li>
-            <li><a class="dropdown-item" href="#">C++</a></li>
-          </ul>
+  <div class="col-md-10 d-flex justify-content-center mx-auto">
+    <div class="main-content w-70 d-flex flex-column h-100">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="dropdown">
+            <button class="btn btn-dark dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown"
+              aria-expanded="false">
+              Programming Language
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+              <li>
+                <a class="dropdown-item" href="#">
+                  <i class="fab fa-js-square me-2"></i>JavaScript
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#">
+                  <i class="fab fa-python me-2"></i>Python
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#">
+                  <i class="fab fa-java me-2"></i>Java
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item" href="#">
+                  <i class="fab fa-cuttlefish me-2"></i>C++
+                </a>
+              </li>
+            </ul>
+          </div>
         </div>
       </div>
-      <div class="col-md-6 text-end">
-        <div class="profile-dropdown">
-          <img src="{{user.image}}" alt="Profile Image" class="profile-image" data-bs-toggle="dropdown"
-            aria-expanded="false">
-          <ul class="dropdown-menu dropdown-menu-end">
-            <li><a class="dropdown-item" href="/auth/logout">Logout</a></li>
-          </ul>
+      <div class="row w-100 flex-grow-1">
+        <div class="col-md-12">
+          <div class="chat-messages h-100">
+            {{#each messages}}
+            <div class="message {{role}}">
+              <p>{{content}}</p>
+            </div>
+            {{/each}}
+          </div>
         </div>
       </div>
-    </div>
-    <div class="chat-container">
-      <div class="chat-messages">
-        {{#each messages}}
-        <div class="message {{role}}">
-          <p>{{content}}</p>
-        </div>
-        {{/each}}
-      </div>
-    </div>
-    <div class="chat-bar-container">
-      <div class="chat-bar">
-        <div class="input-group">
-          <input type="text" class="form-control" id="messageInput" placeholder="Type your message..."
-            aria-label="Message">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="chat-bar">
+            <div class="input-group">
+              <input type="text" class="form-control" id="messageInput" placeholder="Type your message..."
+                aria-label="Message">
+            </div>
+          </div>
         </div>
       </div>
     </div>
