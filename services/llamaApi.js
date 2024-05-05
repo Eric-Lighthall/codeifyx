@@ -4,18 +4,24 @@ const client = new openai({
   apiKey: process.env.TOGETHER_API_KEY,
   baseURL: 'https://api.together.xyz/v1',
 });
+
+let conversationHistory = [];
+
 async function sendMessage(message, res) {
   try {
+
+    conversationHistory.push({
+      role: 'user',
+      content: message,
+    });
+
     const stream = await client.chat.completions.create({
       messages: [
         {
           role: 'system',
           content: 'You will answer whatever the user asks.',
         },
-        {
-          role: 'user',
-          content: message,
-        },
+        ...conversationHistory,
       ],
       model: 'meta-llama/Llama-3-8b-chat-hf',
       max_tokens: 1024,
@@ -28,11 +34,22 @@ async function sendMessage(message, res) {
       'Connection': 'keep-alive',
     });
 
+    let assistantResponse = '';
+
     for await (const chunk of stream) {
       const token = chunk.choices[0].text;
+      assistantResponse += token;
       res.write(`${token}`);
     }
+
+    conversationHistory.push({
+      role: 'assistant',
+      content: assistantResponse,
+    });
+
     res.end();
+
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
   catch (err) {
     console.error(`Error: ${err}`);
