@@ -321,3 +321,27 @@ body {
 .w-70 {
     width: 60%;
 }
+
+.message-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    background-color: #09080c;
+    border-radius: 8px;
+    padding: 14px;
+}
+
+.user-image,
+.assistant-image {
+    width: 40px;
+    height: 40px;
+    margin-right: 10px;
+}
+
+.message-content {
+    width: 100%;
+}
+
+.message-content p {
+    margin: 0 !important;
+}

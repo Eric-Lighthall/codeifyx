@@ -62,7 +62,7 @@
         </div>
       </div>
       <div class="row w-100 flex-grow-1">
-        <div class="col-md-12">
+        <div class="col-md-12 mt-5">
           <div class="chat-messages h-100">
             {{#each messages}}
             <div class="message {{role}}">
@@ -108,12 +108,13 @@
         if (response.ok) {
           const stream = response.body.pipeThrough(new TextDecoderStream()).getReader();
           const assistantMessageElement = addMessageToChat('assistant', '');
+          const assistantMessageContentElement = assistantMessageElement.querySelector('.message-content p');
 
           while (true) {
             const { done, value } = await stream.read();
             if (done) break;
 
-            assistantMessageElement.innerHTML += value;
+            assistantMessageContentElement.innerHTML += value;
             chatMessages.scrollTop = chatMessages.scrollHeight;
           }
         } else {
@@ -128,8 +129,32 @@
 
   function addMessageToChat(role, content) {
     const messageElement = document.createElement('div');
-    messageElement.classList.add('message', role);
-    messageElement.innerHTML = `<p>${content}</p>`;
+    messageElement.classList.add('message');
+
+    if (role === 'user') {
+      messageElement.classList.add('user-message');
+      messageElement.innerHTML = `
+      <div class="message-container">
+        <img src="{{user.image}}" alt="User Image" class="user-image rounded-circle">
+        <div class="message-content">
+          <p>${content}</p>
+        </div>
+      </div>
+    `;
+    } else if (role === 'assistant') {
+      messageElement.classList.add('assistant-message');
+      messageElement.innerHTML = `
+      <div class="message-container">
+        <img src="/images/codeifyxlogosmall.webp" alt="AI Image" class="assistant-image rounded-circle">
+        <div class="message-content">
+          <p>${content}</p>
+        </div>
+      </div>
+    `;
+    } else {
+      messageElement.innerHTML = `<p>${content}</p>`;
+    }
+
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
     return messageElement;
