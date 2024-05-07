@@ -266,7 +266,7 @@ body {
 }
 
 #recent-chats:hover {
-    width: 250px;
+    width: 225px;
 }
 
 .offset-md-2 {
@@ -287,14 +287,22 @@ body {
     min-height: 40px;
 }
 
-.display-name {
+.profile .display-name {
     color: white;
     text-decoration: none;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.fixed-sidebar:hover .profile .display-name {
+    opacity: 1;
+    visibility: visible;
 }
 
 .chat-list,
 .daily-quota,
-.profile .display-name,
 .full-logo {
     display: none;
     white-space: nowrap;
@@ -302,7 +310,6 @@ body {
 
 .fixed-sidebar:hover .chat-list,
 .fixed-sidebar:hover .daily-quota,
-.fixed-sidebar:hover .profile .display-name,
 .fixed-sidebar:hover .full-logo {
     display: block;
 }
@@ -447,7 +454,6 @@ li:last-child .dropdown-item {
 
 .settings-link,
 .terms-link,
-.privacy-link,
 .profile-link {
     color: #fff;
     text-decoration: none;
@@ -455,7 +461,7 @@ li:last-child .dropdown-item {
 
 .settings-link:hover,
 .terms-link:hover,
-.privacy-link:hover {
+.profile-link:hover {
     text-decoration: underline;
 }
 
@@ -465,30 +471,6 @@ li:last-child .dropdown-item {
 
 .separator {
     margin: 0 0.5rem;
-}
-
-.recent-chats-text,
-.chat-title,
-.settings-text,
-.terms-text,
-.privacy-text,
-.display-name-text {
-    opacity: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    animation: text-appear 0.5s ease-in-out forwards;
-}
-
-@keyframes text-appear {
-    0% {
-        opacity: 0;
-        max-width: 0;
-    }
-    100% {
-        opacity: 1;
-        max-width: 100%;
-    }
 }
 
 .settings-link,
@@ -512,8 +494,7 @@ li:last-child .dropdown-item {
 }
 
 .settings-text,
-.terms-text,
-.display-name {
+.terms-text {
     opacity: 0;
     transition: opacity 0.3s ease-in-out;
     white-space: nowrap;
@@ -521,8 +502,20 @@ li:last-child .dropdown-item {
 }
 
 .fixed-sidebar:hover .settings-text,
-.fixed-sidebar:hover .terms-text,
-.fixed-sidebar:hover .display-name {
+.fixed-sidebar:hover .terms-text {
     opacity: 1;
     visibility: visible;
+}
+
+.recent-chats {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.sidebar-footer {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
 }
