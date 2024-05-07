@@ -19,7 +19,7 @@ async function sendMessage(message, res) {
       messages: [
         {
           role: 'system',
-          content: 'You will answer whatever the user asks.',
+          content: 'You are a coding assistant. Try to keep things coding related. Things that are not very coding related you should answer shortly.',
         },
         ...conversationHistory,
       ],
