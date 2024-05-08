@@ -3,6 +3,7 @@ const router = express.Router();
 const { ensureAuth, ensureGuest } = require('../middleware/auth');
 const sendMessage = require('../services/llamaApi');
 const User = require('../models/User');
+const Chat = require('../models/Chat');
 
 // @desc    Landing page
 // @route   GET /
@@ -51,11 +52,23 @@ router.get('/chat', ensureAuth, async (req, res) => {
       displayName: user.displayName,
       image: user.image,
     };
+
+    const recentChats = await Chat.find({ user: req.user._id })
+      .sort({ updatedAt: 1 })
+      .limit(5);
+
+    const recentChatsData = recentChats.map(chat => ({
+      id: chat._id.toString(),
+      title: chat.title,
+    }));
+
     res.render('chat', {
+      chat: null,
       layout: 'chat',
       activeLink: 'home',
       messages: [],
       user: chatUser,
+      recentChats: recentChatsData,
     });
   }
   catch (error) {
@@ -64,13 +77,90 @@ router.get('/chat', ensureAuth, async (req, res) => {
   }
 });
 
+// @desc Chat page with specific ID
+// @route GET /chat/:id
+router.get('/chat/:id', ensureAuth, async (req, res) => {
+  try {
+    const chatId = req.params.id;
+    const userId = req.user._id;
+    const user = await User.findById(userId);
+    const chatUser = {
+      displayName: user.displayName,
+      image: user.image,
+    };
+
+    const chat = await Chat.findOne({ _id: chatId, user: userId }).populate('messages');
+    if (!chat) {
+      return res.status(404).json({ error: 'Chat not found' });
+    }
+
+    const recentChats = await Chat.find({ user: userId })
+      .sort({ updatedAt: 1 })
+      .limit(5);
+
+    const recentChatsData = recentChats.map(chat => ({
+      id: chat._id.toString(),
+      title: chat.title,
+    }));
+
+    const messages = chat.messages.map(message => ({
+      role: message.role,
+      content: message.content,
+    }));
+
+    res.render('chat', {
+      chatId: chat._id.toString(),
+      layout: 'chat',
+      activeLink: 'home',
+      messages: messages,
+      user: chatUser,
+      recentChats: recentChatsData,
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
 // @desc    Chat API
 // @route   POST /api/chat
 router.post('/api/chat', ensureAuth, async (req, res) => {
   try {
+    const userId = req.user._id;
     const message = req.body.message;
+    const chatId = req.body.chatId;
 
-    sendMessage(message, res);
+    let chat;
+
+    if (chatId) {
+      // Update existing chat
+      chat = await Chat.findOne({ _id: chatId, user: userId });
+      if (!chat) {
+        return res.status(404).json({ error: 'Chat not found' });
+      }
+      if (chat) {
+        chat.messages.push({
+          role: 'user',
+          content: message,
+        });
+      }
+    } else {
+      // Create new chat
+      chat = new Chat({
+        user: userId,
+        title: 'New Chat',
+        messages: [
+          {
+            role: 'user',
+            content: message,
+          },
+        ],
+      });
+    }
+
+    await chat.save();
+
+    sendMessage(message, res, chat);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ error: 'An error occurred' });
