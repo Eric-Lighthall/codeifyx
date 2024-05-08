@@ -14,7 +14,7 @@
         <ul class="list-group">
           {{#each recentChats}}
           <li class="list-group-item">
-            <a href="/chat/{{this.id}}">{{this.title}}</a>
+            <a href="/chat/{{this.id}}">Chat {{this.id}}</a>
           </li>
           {{/each}}
         </ul>
@@ -84,15 +84,27 @@
       <div class="row w-100 flex-grow-1">
         <div class="col-md-12 mt-5">
           <div class="chat-messages h-100">
+            {{#if messages.length}}
+            {{#each messages}}
+            <div class="message {{this.role}}">
+              <div class="message-container">
+                {{#if (eq role 'user')}}
+                <img src="{{user.image}}" alt="User Image" class="user-image rounded-circle">
+                {{else}}
+                <img src="/images/codeifyxlogosmall.webp" alt="AI Image" class="assistant-image rounded-circle">
+                {{/if}}
+                <div class="message-content">
+                  <p>{{this.content}}</p>
+                </div>
+              </div>
+            </div>
+            {{/each}}
+            {{else}}
             <div class="empty-state text-center">
               <img src="/images/codeifyxlogosmall.webp" alt="CodeifyX Logo" class="mb-3 small-logo fade-in">
               <h3 class="fw-bold fade-in">What can I help you with?</h3>
             </div>
-            {{#each messages}}
-            <div class="message {{role}}">
-              <p>{{content}}</p>
-            </div>
-            {{/each}}
+            {{/if}}
           </div>
         </div>
       </div>
@@ -102,6 +114,7 @@
             <div class="input-group">
               <input type="text" class="form-control" id="messageInput" placeholder="Type your message..."
                 aria-label="Message">
+              <input type="hidden" id="chatIdInput" value="{{chatId}}">
             </div>
           </div>
         </div>
@@ -115,13 +128,13 @@
   const messageInput = document.getElementById('messageInput');
   const emptyState = document.querySelector('.empty-state');
 
+  let chatId = chatIdInput.value;
+
   messageInput.addEventListener('keypress', async (event) => {
     if (event.key === 'Enter') {
       const userMessage = messageInput.value;
       messageInput.value = '';
       addMessageToChat('user', userMessage);
-
-      emptyState.style.display = 'none';
 
       try {
         const response = await fetch('/api/chat', {
@@ -129,7 +142,10 @@
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ message: userMessage }),
+          body: JSON.stringify({
+            message: userMessage,
+            chatId: chatId,
+          }),
         });
 
         if (response.ok) {
@@ -140,9 +156,17 @@
           while (true) {
             const { done, value } = await stream.read();
             if (done) break;
-
-            assistantMessageContentElement.innerHTML += value;
-            chatMessages.scrollTop = chatMessages.scrollHeight;
+            if (value.startsWith('data: ')) {
+              const data = JSON.parse(value.slice(6));
+              chatId = data.chatId;
+            }
+            else {
+              assistantMessageContentElement.innerHTML += value;
+              chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+          }
+          if (chatId) {
+            history.pushState(null, '', `/chat/${chatId}`);
           }
         } else {
           throw new Error('API request failed');
@@ -184,7 +208,9 @@
 
     chatMessages.appendChild(messageElement);
     chatMessages.scrollTop = chatMessages.scrollHeight;
-    emptyState.style.display = 'none';
+    if (emptyState) {
+      emptyState.style.display = 'none';
+    }
     return messageElement;
   }
 </script>

@@ -5,15 +5,13 @@ const client = new openai({
   baseURL: 'https://api.together.xyz/v1',
 });
 
-let conversationHistory = [];
-
-async function sendMessage(message, res) {
+async function sendMessage(message, res, chat) {
   try {
 
-    conversationHistory.push({
-      role: 'user',
-      content: message,
-    });
+    const conversationHistory = chat.messages.map((msg) => ({
+      role: msg.role,
+      content: msg.content,
+    }));
 
     const stream = await client.chat.completions.create({
       messages: [
@@ -42,11 +40,14 @@ async function sendMessage(message, res) {
       res.write(`${token}`);
     }
 
-    conversationHistory.push({
+    chat.messages.push({
       role: 'assistant',
       content: assistantResponse,
     });
 
+    await chat.save();
+
+    res.write(`data: ${JSON.stringify({ chatId: chat._id })}\n\n`);
     res.end();
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
