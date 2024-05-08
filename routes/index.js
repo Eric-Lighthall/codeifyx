@@ -43,45 +43,10 @@ router.get('/signup', ensureGuest, (req, res) => {
   });
 });
 
-// @desc    Dashboard
-// @route   GET /dashboard
-router.get('/chat', ensureAuth, async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id);
-    const chatUser = {
-      displayName: user.displayName,
-      image: user.image,
-    };
-
-    const recentChats = await Chat.find({ user: req.user._id })
-      .sort({ updatedAt: 1 })
-      .limit(5);
-
-    const recentChatsData = recentChats.map(chat => ({
-      id: chat._id.toString(),
-      title: chat.title,
-    }));
-
-    res.render('chat', {
-      chat: null,
-      layout: 'chat',
-      activeLink: 'home',
-      messages: [],
-      user: chatUser,
-      recentChats: recentChatsData,
-    });
-  }
-  catch (error) {
-    console.error('Error fetching user data:', error);
-    res.redirect('/login');
-  }
-});
-
 // @desc Chat page with specific ID
 // @route GET /chat/:id
-router.get('/chat/:id', ensureAuth, async (req, res) => {
+router.get('/chat/:id?', ensureAuth, async (req, res) => {
   try {
-    const chatId = req.params.id;
     const userId = req.user._id;
     const user = await User.findById(userId);
     const chatUser = {
@@ -89,27 +54,35 @@ router.get('/chat/:id', ensureAuth, async (req, res) => {
       image: user.image,
     };
 
-    const chat = await Chat.findOne({ _id: chatId, user: userId }).populate('messages');
-    if (!chat) {
-      return res.status(404).json({ error: 'Chat not found' });
-    }
-
     const recentChats = await Chat.find({ user: userId })
-      .sort({ updatedAt: 1 })
-      .limit(5);
+      .sort({ updatedAt: -1 })
+      .limit(5)
+      .lean();
 
     const recentChatsData = recentChats.map(chat => ({
       id: chat._id.toString(),
       title: chat.title,
     }));
 
-    const messages = chat.messages.map(message => ({
-      role: message.role,
-      content: message.content,
-    }));
+    let chat = null;
+    let messages = [];
+    let chatId = null;
+
+    if (req.params.id) {
+      chatId = req.params.id;
+      chat = await Chat.findOne({ _id: chatId, user: userId }).populate('messages');
+      if (chat) {
+        messages = chat.messages.map(message => ({
+          role: message.role,
+          content: message.content,
+        }));
+        chatId = chat._id.toString();
+      }
+    }
 
     res.render('chat', {
-      chatId: chat._id.toString(),
+      chat: chat,
+      chatId: chatId,
       layout: 'chat',
       activeLink: 'home',
       messages: messages,

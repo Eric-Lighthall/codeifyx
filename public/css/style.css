@@ -519,3 +519,25 @@ li:last-child .dropdown-item {
     flex-direction: column;
     justify-content: flex-end;
 }
+
+.recent-chats-list {
+    text-align: left;
+}
+
+.recent-chat-item {
+    background-color: transparent;
+    border: none;
+    padding: 10px 0;
+    border-radius: 5px;
+}
+
+.recent-chat-link {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.recent-chat-item:hover {
+    text-decoration: none;
+    background-color: #161b22;
+}
