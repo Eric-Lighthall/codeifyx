@@ -63,7 +63,7 @@ router.get('/chat/:id?', ensureAuth, async (req, res) => {
     const selectedLanguage = languages[0];
 
     const recentChats = await Chat.find({ user: userId })
-      .sort({ updatedAt: -1 })
+      .sort({ updatedAt: 1 })
       .limit(5)
       .lean();
 
@@ -145,6 +145,26 @@ router.post('/api/chat', ensureAuth, async (req, res) => {
     await chat.save();
 
     sendMessage(message, res, chat, selectedLanguage);
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+// @desc Delete chat
+// @route DELETE /api/chat/:id
+router.delete('/api/chat/:id', ensureAuth, async (req, res) => {
+  try {
+    const chatId = req.params.id;
+    const userId = req.user._id;
+
+    const chat = await Chat.findOneAndDelete({ _id: chatId, user: userId });
+
+    if (!chat) {
+      return res.status(404).json({ error: 'Chat not found' });
+    }
+
+    res.json({ message: 'Chat deleted successfully' });
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ error: 'An error occurred' });

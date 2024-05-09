@@ -15,7 +15,12 @@
         <ul class="list-group recent-chats-list">
           {{#each recentChats}}
           <li class="list-group-item recent-chat-item">
-            <a href="/chat/{{this.id}}" class="recent-chat-link">Chat {{this.id}}</a>
+            <div class="d-flex justify-content-between align-items-center">
+              <a href="/chat/{{this.id}}" class="recent-chat-link">Chat {{this.id}}</a>
+              <button class="btn btn-sm btn-danger delete-chat-btn" data-chat-id="{{this.id}}">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
           </li>
           {{/each}}
         </ul>
@@ -146,6 +151,20 @@
             if (value.startsWith('data: ')) {
               const data = JSON.parse(value.slice(6));
               chatId = data.chatId;
+
+              const recentChatsList = document.querySelector('.recent-chats-list');
+              const newChatItem = document.createElement('li');
+              newChatItem.classList.add('list-group-item', 'recent-chat-item');
+              newChatItem.setAttribute('data-chat-id', chatId);
+              newChatItem.innerHTML = `
+              <div class="d-flex justify-content-between align-items-center">
+                <a href="/chat/${chatId}" class="recent-chat-link">Chat ${chatId}</a>
+                <button class="btn btn-sm btn-danger delete-chat-btn" data-chat-id="${chatId}">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+              </div>
+            `;
+              recentChatsList.insertBefore(newChatItem, recentChatsList.firstChild);
             }
             else {
               assistantMessageContentElement.innerHTML += value;
@@ -202,20 +221,54 @@
   }
 
   document.addEventListener('DOMContentLoaded', function () {
-  const languageDropdownItems = document.querySelectorAll('.dropdown-menu a');
-  const languageDropdownButton = document.getElementById('languageDropdown');
+    const languageDropdownItems = document.querySelectorAll('.dropdown-menu a');
+    const languageDropdownButton = document.getElementById('languageDropdown');
 
-  languageDropdownItems.forEach(item => {
-    item.addEventListener('click', function (event) {
-      event.preventDefault();
-      selectedLanguage = this.getAttribute('data-language');
-      const selectedLanguageLogo = this.querySelector('img').src;
-      languageDropdownButton.innerHTML = `
+    languageDropdownItems.forEach(item => {
+      item.addEventListener('click', function (event) {
+        event.preventDefault();
+        selectedLanguage = this.getAttribute('data-language');
+        const selectedLanguageLogo = this.querySelector('img').src;
+        languageDropdownButton.innerHTML = `
         <img src="${selectedLanguageLogo}" class="language-logo me-2" />
         ${selectedLanguage}
         <i class="fas fa-caret-down ms-2"></i>
       `;
+      });
     });
+
+    const deleteChatButtons = document.querySelectorAll('.delete-chat-btn');
+    deleteChatButtons.forEach(button => {
+      button.addEventListener('click', async function (event) {
+        event.preventDefault();
+        const chatId = this.getAttribute('data-chat-id');
+        await deleteChat(chatId);
+      });
+    });
+
+    async function deleteChat(chatId) {
+      try {
+        const response = await fetch(`/api/chat/${chatId}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          const chatItem = document.querySelector(`.recent-chat-item[data-chat-id="${chatId}"]`);
+          if (chatItem) {
+            chatItem.remove();
+          }
+          if (chatId === '{{chatId}}') {
+            window.location.href = '/chat';
+          }
+          else {
+            throw new Error('Failed to delete chat');
+          }
+        }
+      }
+      catch (error) {
+        console.error('Error:', error);
+        alert('Failed to delete chat. Please try again.');
+      }
+    };
   });
-});
 </script>
