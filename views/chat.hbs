@@ -7,10 +7,11 @@
           <img src="/images/codeifyxlogo3.webp" alt="Full Logo" class="full-logo img-fluid mb-2">
         </a>
       </div>
-      <div class="chat-list text-center">
+      <div class="chat-list">
         <h4 class="recent-chats-title mt-4">
           <span class="recent-chats-text">Recent Chats</span>
         </h4>
+        <a href="/chat" class="btn btn-primary new-chat-btn mb-3">New Chat</a>
         <ul class="list-group recent-chats-list">
           {{#each recentChats}}
           <li class="list-group-item recent-chat-item">
@@ -48,35 +49,19 @@
           <div class="dropdown">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="languageDropdown"
               data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg"
-                class="language-logo me-2" />
-              Python
+              <img src="{{selectedLanguage.logo}}" class="language-logo me-2" />
+              {{selectedLanguage.name}}
               <i class="fas fa-caret-down ms-2"></i>
             </button>
             <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+              {{#each languages}}
               <li>
-                <a class="dropdown-item" href="#">
-                  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg"
-                    class="language-logo me-2" />
-                  Python
+                <a class="dropdown-item" href="#" data-language="{{this.name}}">
+                  <img src="{{this.logo}}" class="language-logo me-2" />
+                  {{this.name}}
                 </a>
               </li>
-              <li>
-                <a class="dropdown-item" href="#">
-                  <img
-                    src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg"
-                    class="language-logo me-2" />
-                  JavaScript
-                </a>
-              </li>
-              <li>
-                <a class="dropdown-item" href="#">
-                  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg"
-                    class="language-logo me-2" />
-                  Java
-                </a>
-              </li>
-              <!-- Add more language options as needed -->
+              {{/each}}
             </ul>
           </div>
         </div>
@@ -127,6 +112,7 @@
   const chatMessages = document.querySelector('.chat-messages');
   const messageInput = document.getElementById('messageInput');
   const emptyState = document.querySelector('.empty-state');
+  let selectedLanguage = '{{selectedLanguage.name}}';
 
   let chatId = chatIdInput.value;
 
@@ -145,6 +131,7 @@
           body: JSON.stringify({
             message: userMessage,
             chatId: chatId,
+            language: selectedLanguage,
           }),
         });
 
@@ -213,4 +200,22 @@
     }
     return messageElement;
   }
+
+  document.addEventListener('DOMContentLoaded', function () {
+  const languageDropdownItems = document.querySelectorAll('.dropdown-menu a');
+  const languageDropdownButton = document.getElementById('languageDropdown');
+
+  languageDropdownItems.forEach(item => {
+    item.addEventListener('click', function (event) {
+      event.preventDefault();
+      selectedLanguage = this.getAttribute('data-language');
+      const selectedLanguageLogo = this.querySelector('img').src;
+      languageDropdownButton.innerHTML = `
+        <img src="${selectedLanguageLogo}" class="language-logo me-2" />
+        ${selectedLanguage}
+        <i class="fas fa-caret-down ms-2"></i>
+      `;
+    });
+  });
+});
 </script>

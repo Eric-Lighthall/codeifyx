@@ -54,6 +54,14 @@ router.get('/chat/:id?', ensureAuth, async (req, res) => {
       image: user.image,
     };
 
+    const languages = [
+      { name: 'Python', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/python/python-original.svg' },
+      { name: 'JavaScript', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/javascript/javascript-original.svg' },
+      { name: 'Java', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg' },
+    ];
+
+    const selectedLanguage = languages[0];
+
     const recentChats = await Chat.find({ user: userId })
       .sort({ updatedAt: -1 })
       .limit(5)
@@ -88,6 +96,8 @@ router.get('/chat/:id?', ensureAuth, async (req, res) => {
       messages: messages,
       user: chatUser,
       recentChats: recentChatsData,
+      languages: languages,
+      selectedLanguage: selectedLanguage,
     });
   } catch (error) {
     console.error('Error:', error);
@@ -102,6 +112,7 @@ router.post('/api/chat', ensureAuth, async (req, res) => {
     const userId = req.user._id;
     const message = req.body.message;
     const chatId = req.body.chatId;
+    const selectedLanguage = req.body.language;
 
     let chat;
 
@@ -133,7 +144,7 @@ router.post('/api/chat', ensureAuth, async (req, res) => {
 
     await chat.save();
 
-    sendMessage(message, res, chat);
+    sendMessage(message, res, chat, selectedLanguage);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ error: 'An error occurred' });

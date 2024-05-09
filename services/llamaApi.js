@@ -5,7 +5,7 @@ const client = new openai({
   baseURL: 'https://api.together.xyz/v1',
 });
 
-async function sendMessage(message, res, chat) {
+async function sendMessage(message, res, chat, language) {
   try {
 
     const conversationHistory = chat.messages.map((msg) => ({
@@ -13,11 +13,16 @@ async function sendMessage(message, res, chat) {
       content: msg.content,
     }));
 
+    console.log(language);
+
     const stream = await client.chat.completions.create({
       messages: [
         {
           role: 'system',
-          content: 'You are a coding assistant. Try to keep things coding related. Things that are not very coding related you should answer shortly.',
+          content: `You are a programming assistant with expertise in ${language}. 
+          Your role involves building, refactoring and debugging code written in ${language}.
+          When refactoring code, you work step by step to ensure that the code you provide is a drop-in replacement for the source code, written in ${language}.
+          If the user asks a non coding related question, answer very shortly, and ask if they have a coding question.`,
         },
         ...conversationHistory,
       ],

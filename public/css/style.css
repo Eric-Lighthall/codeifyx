@@ -520,7 +520,7 @@ li:last-child .dropdown-item {
     justify-content: flex-end;
 }
 
-.recent-chats-list {
+.chat-list, .recent-chats-title, .recent-chats-list {
     text-align: left;
 }
 
@@ -528,7 +528,6 @@ li:last-child .dropdown-item {
     background-color: transparent;
     border: none;
     padding: 10px 0;
-    border-radius: 5px;
 }
 
 .recent-chat-link {
@@ -540,4 +539,20 @@ li:last-child .dropdown-item {
 .recent-chat-item:hover {
     text-decoration: none;
     background-color: #161b22;
+}
+
+.new-chat-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 4px;
+    text-decoration: none;
+    text-align: left;
+}
+
+.new-chat-btn:hover {
+    background-color: #0056b3;
 }
