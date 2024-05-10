@@ -301,7 +301,6 @@ body {
     visibility: visible;
 }
 
-.chat-list,
 .daily-quota,
 .full-logo {
     display: none;
@@ -315,11 +314,16 @@ body {
 }
 
 .logo-container {
-    width: 50px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-.fixed-sidebar:hover .logo-container {
-    width: 200px;
+.fixed-sidebar:not(:hover) .logo-container {
+    width: 100%;
+    margin-right: 0;
 }
 
 .fixed-sidebar .small-logo {
@@ -363,8 +367,8 @@ body {
 }
 
 .language-logo {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
 }
 
 .dropdown-toggle {
@@ -520,14 +524,17 @@ li:last-child .dropdown-item {
     justify-content: flex-end;
 }
 
-.chat-list, .recent-chats-title, .recent-chats-list {
+.chat-list,
+.recent-chats-title,
+.recent-chats-list {
     text-align: left;
 }
 
 .recent-chat-item {
     background-color: transparent;
     border: none;
-    padding: 10px 0;
+    padding: 5px 0;
+    margin-top: 10px;
 }
 
 .recent-chat-link {
@@ -542,7 +549,7 @@ li:last-child .dropdown-item {
 }
 
 .new-chat-btn {
-    background-color: #007bff;
+    background-color: #21262d;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -554,5 +561,58 @@ li:last-child .dropdown-item {
 }
 
 .new-chat-btn:hover {
-    background-color: #0056b3;
+    background-color: #363e49;
+}
+
+.new-chat-icon {
+    font-size: 20px;
+    margin-right: 10px;
+    transition: margin-right 0.3s ease;
+}
+
+.new-chat-text {
+    opacity: 0;
+    visibility: hidden;
+    display: none;
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+}
+
+.fixed-sidebar:hover .new-chat-icon {
+    margin-right: 10px;
+}
+
+.fixed-sidebar:hover .new-chat-text {
+    opacity: 1;
+    display: block;
+    visibility: visible;
+}
+
+.fixed-sidebar:not(:hover) .new-chat-btn {
+    justify-content: center;
+}
+
+.fixed-sidebar:not(:hover) .new-chat-icon {
+    margin-right: 0;
+}
+
+.chat-details {
+    font-size: 0.9rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out;
+    white-space: nowrap;
+    margin-left: 10px;
+    display: none;
+}
+
+.fixed-sidebar:hover .chat-details {
+    opacity: 1;
+    visibility: visible;
+    display: block;
+}
+
+.fixed-sidebar:not(:hover) .recent-chats-title,
+.fixed-sidebar:not(:hover) .delete-chat-btn {
+    display: none;
 }

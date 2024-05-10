@@ -11,16 +11,22 @@
         <h4 class="recent-chats-title mt-4">
           <span class="recent-chats-text">Recent Chats</span>
         </h4>
-        <a href="/chat" class="btn btn-primary new-chat-btn mb-3">New Chat</a>
+        <a href="/chat" class="btn btn-primary new-chat-btn d-flex align-items-center">
+          <i class="fas fa-plus new-chat-icon"></i>
+          <span class="new-chat-text ms-2">New Chat</span>
+        </a>
         <ul class="list-group recent-chats-list">
           {{#each recentChats}}
           <li class="list-group-item recent-chat-item">
-            <div class="d-flex justify-content-between align-items-center">
-              <a href="/chat/{{this.id}}" class="recent-chat-link">Chat {{this.id}}</a>
+            <a href="/chat/{{this.id}}" class="recent-chat-link d-flex align-items-center text-decoration-none">
+              <div class="logo-container d-flex align-items-center">
+                <img src="{{this.languageLogo}}" alt="Language Logo" class="language-logo">
+              </div>
+              <span class="chat-details flex-grow-1 ms-2">Chat</span>
               <button class="btn btn-sm btn-danger delete-chat-btn" data-chat-id="{{this.id}}">
                 <i class="fas fa-trash-alt"></i>
               </button>
-            </div>
+            </a>
           </li>
           {{/each}}
         </ul>
@@ -151,6 +157,8 @@
             if (value.startsWith('data: ')) {
               const data = JSON.parse(value.slice(6));
               const newChatId = data.chatId;
+              const newChatLanguage = selectedLanguage;
+              const newChatLanguageLogo = document.querySelector(`.dropdown-menu a[data-language="${newChatLanguage}"] img`).getAttribute('src');
 
               if (newChatId !== chatId) {
                 const recentChatsList = document.querySelector('.recent-chats-list');
@@ -160,13 +168,17 @@
                   const newChatItem = document.createElement('li');
                   newChatItem.classList.add('list-group-item', 'recent-chat-item');
                   newChatItem.setAttribute('data-chat-id', newChatId);
+
                   newChatItem.innerHTML = `
-                  <div class="d-flex justify-content-between align-items-center">
-                    <a href="/chat/${newChatId}" class="recent-chat-link">Chat ${newChatId}</a>
+                  <a href="/chat/${newChatId}" class="recent-chat-link d-flex align-items-center text-decoration-none">
+                    <div class="logo-container d-flex align-items-center">
+                      <img src="${newChatLanguageLogo}" alt="Language Logo" class="language-logo">
+                    </div>
+                    <span class="chat-details flex-grow-1 ms-2">Chat ${newChatId}</span>
                     <button class="btn btn-sm btn-danger delete-chat-btn" data-chat-id="${newChatId}">
                       <i class="fas fa-trash-alt"></i>
                     </button>
-                  </div>
+                  </a>
                 `;
                   recentChatsList.insertBefore(newChatItem, recentChatsList.firstChild);
                 }

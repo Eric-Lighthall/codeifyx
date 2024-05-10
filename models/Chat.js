@@ -11,6 +11,10 @@ const ChatSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
+    language: {
+        type: String,
+        required: true,
+    },
     messages: [
         {
             role: {
@@ -23,6 +27,6 @@ const ChatSchema = new mongoose.Schema({
             },
         },
     ],
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Chat', ChatSchema);

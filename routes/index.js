@@ -63,13 +63,14 @@ router.get('/chat/:id?', ensureAuth, async (req, res) => {
     const selectedLanguage = languages[0];
 
     const recentChats = await Chat.find({ user: userId })
-      .sort({ updatedAt: 1 })
+      .sort({ updatedAt: -1 })
       .limit(5)
       .lean();
 
     const recentChatsData = recentChats.map(chat => ({
       id: chat._id.toString(),
       title: chat.title,
+      languageLogo: languages.find(lang => lang.name === chat.language)?.logo || '',
     }));
 
     let chat = null;
@@ -133,6 +134,7 @@ router.post('/api/chat', ensureAuth, async (req, res) => {
       chat = new Chat({
         user: userId,
         title: 'New Chat',
+        language: selectedLanguage,
         messages: [
           {
             role: 'user',
