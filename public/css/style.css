@@ -313,7 +313,7 @@ body {
     display: block;
 }
 
-.logo-container {
+.language-logo-container {
     width: 40px;
     height: 40px;
     display: flex;
@@ -321,9 +321,13 @@ body {
     align-items: center;
 }
 
-.fixed-sidebar:not(:hover) .logo-container {
+.fixed-sidebar:not(:hover) .language-logo-container {
     width: 100%;
     margin-right: 0;
+}
+
+.small-logo, .full-logo {
+    height: 40px;
 }
 
 .fixed-sidebar .small-logo {
@@ -453,7 +457,7 @@ li:last-child .dropdown-item {
 .recent-chats-title {
     font-size: 1.2rem;
     font-weight: bold;
-    margin-bottom: 1rem;
+    margin: 0;
 }
 
 .settings-link,
@@ -612,7 +616,53 @@ li:last-child .dropdown-item {
     display: block;
 }
 
-.fixed-sidebar:not(:hover) .recent-chats-title,
 .fixed-sidebar:not(:hover) .delete-chat-btn {
     display: none;
 }
+
+.chat-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.recent-chats-header {
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.recent-chats-icon {
+    font-size: 20px;
+}
+
+.recent-chats-title {
+    display: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    white-space: nowrap;
+}
+
+.fixed-sidebar:hover .recent-chats-icon {
+    margin-right: 10px;
+}
+
+.fixed-sidebar:hover .recent-chats-title {
+    display: block;
+    opacity: 1;
+    visibility: visible;
+}
+
+.recent-chats-separator {
+    width: 80%;
+    height: 1px;
+    background-color: #252b32;
+}
+
+.fixed-sidebar:not(:hover) .recent-chats-separator {
+    width: 70%;
+}
+

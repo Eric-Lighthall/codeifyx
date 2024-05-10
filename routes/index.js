@@ -71,6 +71,7 @@ router.get('/chat/:id?', ensureAuth, async (req, res) => {
       id: chat._id.toString(),
       title: chat.title,
       languageLogo: languages.find(lang => lang.name === chat.language)?.logo || '',
+      updatedAt: chat.updatedAt,
     }));
 
     let chat = null;

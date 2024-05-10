@@ -1,16 +1,18 @@
 <div class="row h-100">
   <div class="col-md-2 fixed-sidebar" id="recent-chats">
     <div class="recent-chats d-flex flex-column h-100">
-      <div class="text-center mt-3 logo-container">
-        <a href="/">
+      <div class="text-center mt-4 logo-container">
+        <a href="/" class="d-flex justify-content-center">
           <img src="/images/codeifyxlogosmall.webp" alt="Small Logo" class="small-logo img-fluid">
-          <img src="/images/codeifyxlogo3.webp" alt="Full Logo" class="full-logo img-fluid mb-2">
+          <img src="/images/codeifyxlogo3.webp" alt="Full Logo" class="full-logo img-fluid">
         </a>
       </div>
       <div class="chat-list">
-        <h4 class="recent-chats-title mt-4">
-          <span class="recent-chats-text">Recent Chats</span>
-        </h4>
+        <div class="recent-chats-header d-flex align-items-center mt-5">
+          <i class="fas fa-history recent-chats-icon"></i>
+          <h4 class="recent-chats-title">Recent Chats</h4>
+        </div>
+        <div class="recent-chats-separator mb-3 mx-auto"></div>
         <a href="/chat" class="btn btn-primary new-chat-btn d-flex align-items-center">
           <i class="fas fa-plus new-chat-icon"></i>
           <span class="new-chat-text ms-2">New Chat</span>
@@ -19,7 +21,7 @@
           {{#each recentChats}}
           <li class="list-group-item recent-chat-item">
             <a href="/chat/{{this.id}}" class="recent-chat-link d-flex align-items-center text-decoration-none">
-              <div class="logo-container d-flex align-items-center">
+              <div class="language-logo-container d-flex align-items-center">
                 <img src="{{this.languageLogo}}" alt="Language Logo" class="language-logo">
               </div>
               <span class="chat-details flex-grow-1 ms-2">Chat</span>
@@ -160,16 +162,19 @@
               const newChatLanguage = selectedLanguage;
               const newChatLanguageLogo = document.querySelector(`.dropdown-menu a[data-language="${newChatLanguage}"] img`).getAttribute('src');
 
-              if (newChatId !== chatId) {
-                const recentChatsList = document.querySelector('.recent-chats-list');
-                const existingChatItem = recentChatsList.querySelector(`[data-chat-id="${newChatId}"]`);
+              const recentChatsList = document.querySelector('.recent-chats-list');
+              const existingChatItem = recentChatsList.querySelector(`.recent-chat-item a[href="/chat/${newChatId}"]`);
+              if (existingChatItem) {
+                // Move existing chat item to the top
+                const chatItem = existingChatItem.closest('.recent-chat-item');
+                recentChatsList.removeChild(chatItem);
+                recentChatsList.insertBefore(chatItem, recentChatsList.firstChild);
+              }
+              else {
+                const newChatItem = document.createElement('li');
+                newChatItem.classList.add('list-group-item', 'recent-chat-item');
 
-                if (!existingChatItem) {
-                  const newChatItem = document.createElement('li');
-                  newChatItem.classList.add('list-group-item', 'recent-chat-item');
-                  newChatItem.setAttribute('data-chat-id', newChatId);
-
-                  newChatItem.innerHTML = `
+                newChatItem.innerHTML = `
                   <a href="/chat/${newChatId}" class="recent-chat-link d-flex align-items-center text-decoration-none">
                     <div class="logo-container d-flex align-items-center">
                       <img src="${newChatLanguageLogo}" alt="Language Logo" class="language-logo">
@@ -180,8 +185,7 @@
                     </button>
                   </a>
                 `;
-                  recentChatsList.insertBefore(newChatItem, recentChatsList.firstChild);
-                }
+                recentChatsList.insertBefore(newChatItem, recentChatsList.firstChild);
               }
               chatId = newChatId;
             }
