@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { ensureAuth, ensureGuest } = require('../middleware/auth');
-const sendMessage = require('../services/llamaApi');
+const llamaApi = require('../services/llamaApi');
 const User = require('../models/User');
 const Chat = require('../models/Chat');
 
@@ -60,7 +60,7 @@ router.get('/chat/:id?', ensureAuth, async (req, res) => {
       { name: 'Java', logo: 'https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/java/java-original.svg' },
     ];
 
-    const selectedLanguage = languages[0];
+    let selectedLanguage = languages[0];
 
     const recentChats = await Chat.find({ user: userId })
       .sort({ updatedAt: -1 })
@@ -87,6 +87,7 @@ router.get('/chat/:id?', ensureAuth, async (req, res) => {
           content: message.content,
         }));
         chatId = chat._id.toString();
+        selectedLanguage = languages.find(lang => lang.name === chat.language) || languages[0];
       }
     }
 
@@ -134,7 +135,7 @@ router.post('/api/chat', ensureAuth, async (req, res) => {
       // Create new chat
       chat = new Chat({
         user: userId,
-        title: 'New Chat',
+        title: 'New Chat...',
         language: selectedLanguage,
         messages: [
           {
@@ -143,11 +144,12 @@ router.post('/api/chat', ensureAuth, async (req, res) => {
           },
         ],
       });
+      chat.title = await llamaApi.summarizeChat(chat.messages);
     }
 
     await chat.save();
 
-    sendMessage(message, res, chat, selectedLanguage);
+    llamaApi.sendMessage(message, res, chat, selectedLanguage);
   } catch (error) {
     console.error('Error:', error);
     res.status(500).json({ error: 'An error occurred' });

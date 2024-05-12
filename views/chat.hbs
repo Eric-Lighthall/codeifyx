@@ -1,10 +1,10 @@
 <div class="row h-100">
   <div class="col-md-2 fixed-sidebar" id="recent-chats">
     <div class="recent-chats d-flex flex-column h-100">
-      <div class="text-center mt-4 logo-container">
-        <a href="/" class="d-flex justify-content-center">
-          <img src="/images/codeifyxlogosmall.webp" alt="Small Logo" class="small-logo img-fluid">
-          <img src="/images/codeifyxlogo3.webp" alt="Full Logo" class="full-logo img-fluid">
+      <div class="text-center my-4 logo-container">
+        <a href="/">
+          <img src="/images/codeifyxlogosmall.webp" alt="Small Logo" class="small-logo">
+          <img src="/images/codeifyxlogo3.webp" alt="Full Logo" class="full-logo">
         </a>
       </div>
       <div class="chat-list">
@@ -12,10 +12,10 @@
           <i class="fas fa-history recent-chats-icon"></i>
           <h4 class="recent-chats-title">Recent Chats</h4>
         </div>
-        <div class="recent-chats-separator mb-3 mx-auto"></div>
+        <div class="recent-chats-separator mb-3 mt-1"></div>
         <a href="/chat" class="btn btn-primary new-chat-btn d-flex align-items-center">
           <i class="fas fa-plus new-chat-icon"></i>
-          <span class="new-chat-text ms-2">New Chat</span>
+          <span class="new-chat-text">New Chat</span>
         </a>
         <ul class="list-group recent-chats-list">
           {{#each recentChats}}
@@ -24,7 +24,7 @@
               <div class="language-logo-container d-flex align-items-center">
                 <img src="{{this.languageLogo}}" alt="Language Logo" class="language-logo">
               </div>
-              <span class="chat-details flex-grow-1 ms-2">Chat</span>
+              <span class="chat-details flex-grow-1 me-2">{{this.title}}</span>
               <button class="btn btn-sm btn-danger delete-chat-btn" data-chat-id="{{this.id}}">
                 <i class="fas fa-trash-alt"></i>
               </button>
@@ -270,6 +270,13 @@
         await deleteChat(chatId);
       }
     });
+
+    const selectedLanguageLogo = document.querySelector(`.dropdown-menu a[data-language="${selectedLanguage}"] img`).getAttribute('src');
+    languageDropdownButton.innerHTML = `
+    <img src="${selectedLanguageLogo}" class="language-logo me-2" />
+    ${selectedLanguage}
+    <i class="fas fa-caret-down ms-2"></i>
+  `;
   });
 
   async function deleteChat(chatId) {
