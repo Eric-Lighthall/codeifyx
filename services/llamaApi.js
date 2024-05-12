@@ -1,4 +1,5 @@
 const openai = require('openai');
+const prettier = require('prettier');
 
 const client = new openai({
   apiKey: process.env.TOGETHER_API_KEY,
@@ -21,7 +22,7 @@ async function sendMessage(message, res, chat, language) {
           role: 'system',
           content: `The user-selected langugage is ${language}.
           If a user tries to ask a question in another langugage, redirect them to ${language}.
-          You are a programming assistant with expertise in ${language}. 
+          You are a programming assistant with expertise in all languages, but the selected language is ${language}. 
           Your role involves building, refactoring and debugging code written in ${language}.
           When refactoring code, you work step by step to ensure that the code you provide is a drop-in replacement for the source code, written in ${language}.
           If the user asks a non coding related question, answer very shortly, and ask if they have a coding question.`,
@@ -44,7 +45,8 @@ async function sendMessage(message, res, chat, language) {
     for await (const chunk of stream) {
       const token = chunk.choices[0].text;
       assistantResponse += token;
-      res.write(`${token}`);
+      console.log(chunk.choices[0]);
+      res.write(token);
     }
 
     chat.messages.push({

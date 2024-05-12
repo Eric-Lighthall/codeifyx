@@ -92,7 +92,7 @@
                 <img src="/images/codeifyxlogosmall.webp" alt="AI Image" class="assistant-image rounded-circle">
                 {{/if}}
                 <div class="message-content">
-                  <p>{{this.content}}</p>
+                  <pre>{{this.content}}</pre>
                 </div>
               </div>
             </div>
@@ -151,7 +151,7 @@
         if (response.ok) {
           const stream = response.body.pipeThrough(new TextDecoderStream()).getReader();
           const assistantMessageElement = addMessageToChat('assistant', '');
-          const assistantMessageContentElement = assistantMessageElement.querySelector('.message-content p');
+          const assistantMessageContentElement = assistantMessageElement.querySelector('.message-content pre');
 
           while (true) {
             const { done, value } = await stream.read();
@@ -225,11 +225,13 @@
     `;
     } else if (role === 'assistant') {
       messageElement.classList.add('assistant-message');
+      const messageContent = document.createElement('div');
+      messageContent.classList.add('message-content');
       messageElement.innerHTML = `
       <div class="message-container">
         <img src="/images/codeifyxlogosmall.webp" alt="AI Image" class="assistant-image rounded-circle">
         <div class="message-content">
-          <p>${content}</p>
+          <pre>${content}</pre>
         </div>
       </div>
     `;
