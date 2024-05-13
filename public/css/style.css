@@ -428,7 +428,15 @@ li:last-child .dropdown-item {
 
 #languageDropdown {
     background-color: #0d1116;
+    position: fixed;
+    left: 100px;
+    top: 20px;
+    transition: 0.3s ease;
 }
+
+.fixed-sidebar:hover ~ .dropdown #languageDropdown {
+    left: 270px;
+  }
 
 .fa-caret-down {
     font-size: 0.9rem;
@@ -440,7 +448,7 @@ li:last-child .dropdown-item {
     align-items: center;
     justify-content: center;
     height: 100%;
-    padding-bottom: 20vh;
+    margin-bottom: 10vh;
 }
 
 .empty-state .small-logo {
@@ -670,4 +678,23 @@ li:last-child .dropdown-item {
 .logo-container a {
     position: absolute;
     width: 100%;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column-reverse;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
 }

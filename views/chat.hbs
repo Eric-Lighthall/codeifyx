@@ -55,33 +55,33 @@
       </div>
     </div>
   </div>
+  <div class="dropdown">
+    <button class="btn btn-secondary dropdown-toggle" type="button" id="languageDropdown" data-bs-toggle="dropdown"
+      aria-expanded="false">
+      <img src="{{selectedLanguage.logo}}" class="language-logo me-2" />
+      {{selectedLanguage.name}}
+      <i class="fas fa-caret-down ms-2"></i>
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="languageDropdown">
+      {{#each languages}}
+      <li>
+        <a class="dropdown-item" href="#" data-language="{{this.name}}">
+          <img src="{{this.logo}}" class="language-logo me-2" />
+          {{this.name}}
+        </a>
+      </li>
+      {{/each}}
+    </ul>
+  </div>
   <div class="col-md-10 d-flex justify-content-center mx-auto">
     <div class="main-content w-70 d-flex flex-column h-100">
       <div class="row">
         <div class="col-md-12">
-          <div class="dropdown">
-            <button class="btn btn-secondary dropdown-toggle" type="button" id="languageDropdown"
-              data-bs-toggle="dropdown" aria-expanded="false">
-              <img src="{{selectedLanguage.logo}}" class="language-logo me-2" />
-              {{selectedLanguage.name}}
-              <i class="fas fa-caret-down ms-2"></i>
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="languageDropdown">
-              {{#each languages}}
-              <li>
-                <a class="dropdown-item" href="#" data-language="{{this.name}}">
-                  <img src="{{this.logo}}" class="language-logo me-2" />
-                  {{this.name}}
-                </a>
-              </li>
-              {{/each}}
-            </ul>
-          </div>
         </div>
       </div>
       <div class="row w-100 flex-grow-1">
         <div class="col-md-12 mt-5">
-          <div class="chat-messages h-100">
+          <div class="chat-messages">
             {{#if messages.length}}
             {{#each messages}}
             <div class="message {{this.role}}">

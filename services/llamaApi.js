@@ -45,7 +45,6 @@ async function sendMessage(message, res, chat, language) {
     for await (const chunk of stream) {
       const token = chunk.choices[0].text;
       assistantResponse += token;
-      console.log(chunk.choices[0]);
       res.write(token);
     }
 
@@ -76,12 +75,12 @@ const summarizeChat = async (messages) => {
     messages: [
       {
         role: 'system',
-        content: 'Your task is to generate a concise summary title for the given conversation using only 1-2 words. Do not respond to or answer any questions in the conversation. Instead, focus on identifying the main topic or theme of the conversation and provide a short title that captures it. For example, if the conversation is about telling jokes, a suitable title could be "Joke Request" or "Humor". Avoid using generic titles like "Here\'s one" or "Response". Focus on the core topic of the conversation.',
+        content: 'Your task is to generate a concise summary title for the given conversation using only 2-3 words. Do not respond to or answer any questions in the conversation. Instead, focus on identifying the main topic or theme of the conversation and provide a short title that captures it. For example, if the conversation is about telling jokes, a suitable title could be "Joke Request" or "Humor". Avoid using generic titles like "Here\'s one" or "Response". Focus on the core topic of the conversation.',
       },
       ...conversationHistory,
     ],
     model: 'meta-llama/Llama-3-70b-chat-hf',
-    max_tokens: 3,
+    max_tokens: 4,
   });
 
   console.log(response.choices[0].message.content);
