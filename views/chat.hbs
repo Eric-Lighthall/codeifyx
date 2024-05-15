@@ -73,37 +73,31 @@
       {{/each}}
     </ul>
   </div>
-  <div class="col-md-10 d-flex justify-content-center mx-auto">
-    <div class="main-content w-70 d-flex flex-column h-100">
-      <div class="row">
-        <div class="col-md-12">
-        </div>
-      </div>
-      <div class="row w-100 flex-grow-1">
-        <div class="col-md-12 mt-5">
-          <div class="chat-messages">
-            {{#if messages.length}}
-            {{#each messages}}
-            <div class="message {{this.role}}">
-              <div class="message-container">
-                {{#if (eq role 'user')}}
-                <img src="{{user.image}}" alt="User Image" class="user-image rounded-circle">
-                {{else}}
-                <img src="/images/codeifyxlogosmall.webp" alt="AI Image" class="assistant-image rounded-circle">
-                {{/if}}
-                <div class="message-content">
-                  <pre>{{this.content}}</pre>
-                </div>
+  <div class="full-width-container">
+    <div class="main-content d-flex flex-column">
+      <div class="w-100 flex-grow-1">
+        <div class="chat-messages">
+          {{#if messages.length}}
+          {{#each messages}}
+          <div class="message {{this.role}}">
+            <div class="message-container">
+              {{#if (eq role 'user')}}
+              <img src="{{user.image}}" alt="User Image" class="user-image rounded-circle">
+              {{else}}
+              <img src="/images/codeifyxlogosmall.webp" alt="AI Image" class="assistant-image rounded-circle">
+              {{/if}}
+              <div class="message-content">
+                <pre>{{this.content}}</pre>
               </div>
             </div>
-            {{/each}}
-            {{else}}
-            <div class="empty-state text-center">
-              <img src="/images/codeifyxlogosmall.webp" alt="CodeifyX Logo" class="mb-3 small-logo fade-in">
-              <h3 class="fw-bold fade-in">What can I help you with?</h3>
-            </div>
-            {{/if}}
           </div>
+          {{/each}}
+          {{else}}
+          <div class="empty-state text-center">
+            <img src="/images/codeifyxlogosmall.webp" alt="CodeifyX Logo" class="mb-3 small-logo fade-in">
+            <h3 class="fw-bold fade-in">What can I help you with?</h3>
+          </div>
+          {{/if}}
         </div>
       </div>
       <div class="row">
@@ -123,6 +117,7 @@
 
 <script>
   const chatMessages = document.querySelector('.chat-messages');
+  const chatContainer = document.querySelector('.full-width-container');
   const messageInput = document.getElementById('messageInput');
   const emptyState = document.querySelector('.empty-state');
   let selectedLanguage = '{{selectedLanguage.name}}';
@@ -191,7 +186,7 @@
             }
             else {
               assistantMessageContentElement.innerHTML += value;
-              chatMessages.scrollTop = chatMessages.scrollHeight;
+              chatContainer.scrollTop = chatContainer.scrollHeight;
             }
           }
 
@@ -240,7 +235,7 @@
     }
 
     chatMessages.appendChild(messageElement);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    chatContainer.scrollTop = chatContainer.scrollHeight;
     if (emptyState) {
       emptyState.style.display = 'none';
     }
@@ -250,6 +245,8 @@
   document.addEventListener('DOMContentLoaded', function () {
     const languageDropdownItems = document.querySelectorAll('.dropdown-menu a');
     const languageDropdownButton = document.getElementById('languageDropdown');
+
+    chatContainer.scrollTop = chatContainer.scrollHeight;
 
     languageDropdownItems.forEach(item => {
       item.addEventListener('click', function (event) {
