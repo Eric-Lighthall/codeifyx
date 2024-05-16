@@ -75,7 +75,7 @@ const summarizeChat = async (messages) => {
     messages: [
       {
         role: 'system',
-        content: 'Your task is to generate a concise summary title for the given conversation using only 2-3 words. Do not respond to or answer any questions in the conversation. Instead, focus on identifying the main topic or theme of the conversation and provide a short title that captures it. For example, if the conversation is about telling jokes, a suitable title could be "Joke Request" or "Humor". Avoid using generic titles like "Here\'s one" or "Response". Focus on the core topic of the conversation.',
+        content: 'Your task is to generate a concise summary title for the given conversation using exactly 2 words. No more than 2, no less than 2 words, even if there is apparent conversation. Do not respond to or answer any questions in the conversation. Instead, focus on identifying the main topic or theme of the conversation and provide a short title that captures it. For example, if the conversation is about telling jokes, a suitable title could be "Joke Request" or "Humor". Avoid using generic titles like "Here\'s one" or "Response". Focus on the core topic of the conversation.',
       },
       ...conversationHistory,
     ],
