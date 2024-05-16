@@ -20,21 +20,32 @@ connectDB();
 
 const app = express();
 
+if (process.env.NODE_ENV === 'development') {
+    app.use(morgan('dev'));
+}
+
+if (process.env.NODE_ENV === 'production') {
+    app.use((req, res, next) => {
+        if (req.header('x-forwarded-proto') !== 'https') {
+            res.redirect(`https://${req.header('host')}${req.url}`);
+        }
+        else {
+            next();
+        }
+    });
+}
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.json());
 app.use(express.static('public'));
-
-if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev'));
-}
 
 // Handlebars
 const hbs = exphbs.create({
     defaultLayout: 'main',
     extname: '.hbs',
 });
-  
+
 // Register Handlebars helpers
 hbs.handlebars.registerHelper('eq', function (a, b) {
     return a === b;
