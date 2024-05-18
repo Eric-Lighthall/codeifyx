@@ -43,6 +43,23 @@ router.get('/signup', ensureGuest, (req, res) => {
   });
 });
 
+router.get('/terms', (req, res) => {
+  let homeUser = null;
+
+  if (req.isAuthenticated()) {
+    const user = req.user;
+    homeUser = {
+      displayName: user.displayName,
+      image: user.image,
+    };
+  }
+
+  res.render('terms', {
+    layout: 'terms',
+    user: homeUser
+  });
+});
+
 // @desc Chat page with specific ID
 // @route GET /chat/:id
 router.get('/chat/:id?', ensureAuth, async (req, res) => {

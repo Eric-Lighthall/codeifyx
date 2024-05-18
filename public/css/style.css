@@ -716,3 +716,7 @@ li:last-child .dropdown-item {
     height: 100%;
     overflow-y: auto;
 }
+
+.terms-section {
+    margin-bottom: 20px;
+}
