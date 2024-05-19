@@ -720,3 +720,80 @@ li:last-child .dropdown-item {
 .terms-section {
     margin-bottom: 20px;
 }
+
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.image-container img {
+    display: block;
+}
+
+.image-container::before {
+    content: "";
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    border-radius: 25px;
+    background: url("../images/codeifyxshowcase.png") no-repeat center/cover;
+    filter: blur(20px);
+    z-index: -1;
+}
+
+.custom-table {
+    background-color: transparent;
+    color: white;
+    font-size: 1.1rem;
+}
+
+.custom-table td,
+.custom-table th {
+    background-color: transparent;
+    color: white;
+}
+
+.custom-table th {
+    font-size: 1.3rem;
+    font-weight: bold;
+    padding-bottom: 2rem;
+}
+
+.custom-hr {
+    border: none;
+    border-top: 1px solid #6c757d;
+    margin: 0.5rem 0;
+    width: 120%;
+    transform: translateX(-10%);
+}
+
+.header-plans {
+    background: linear-gradient(to bottom right, #e69f57, #e0727a, #bd3fb1);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-weight: bold;
+}
+
+.btn-yellow {
+    background-color: #ffc107;
+    color: #fff;
+}
+
+.btn-gradient {
+    background: linear-gradient(to bottom right, #e69f57, #e0727a, #bd3fb1);
+    color: #fff;
+}
+
+.btn-yellow:hover,
+.btn-gradient:hover {
+    color: #fff;
+    opacity: 0.9;
+}
+
+.btn small {
+    font-size: 0.8rem;
+    display: block;
+}

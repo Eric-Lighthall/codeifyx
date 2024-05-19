@@ -82,12 +82,10 @@ const summarizeChat = async (messages) => {
     model: 'meta-llama/Llama-3-70b-chat-hf',
     max_tokens: 4,
   });
-
-  console.log(response.choices[0].message.content);
+  
   const summary = response.choices[0].message.content;
   const strippedSummary = summary.replace(/['"]+/g, '');
 
-  console.log(strippedSummary);
   return strippedSummary;
 };
 
