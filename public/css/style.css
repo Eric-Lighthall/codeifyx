@@ -793,7 +793,12 @@ li:last-child .dropdown-item {
     opacity: 0.9;
 }
 
-.btn small {
+.btn-custom {
+    padding: 0.5rem 1.5rem;
+    font-size: 1.1rem;
+}
+
+.btn-custom small {
     font-size: 0.8rem;
     display: block;
 }
