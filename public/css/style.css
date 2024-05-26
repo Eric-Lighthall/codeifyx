@@ -40,8 +40,11 @@ p {
 .form-control::placeholder {
     color: #ccc;
 }
+#login {
+    background-color: #01040A;
+}
 .login-option {
-    background-color: #1e1e2d;
+    background-color: #151A21;
     border-radius: 5px;
     padding: 15px;
     cursor: pointer;
@@ -201,7 +204,6 @@ body {
 
 .or-separator span {
     display: inline-block;
-    background-color: #11121c;
     padding: 0 10px;
     font-size: 0.9rem;
 }
