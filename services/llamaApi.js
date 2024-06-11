@@ -48,14 +48,16 @@ async function sendMessage(message, res, chat, language) {
       res.write(token);
     }
 
+    const formattedResponse = formatAssistantResponse(assistantResponse);
+
     chat.messages.push({
       role: 'assistant',
-      content: assistantResponse,
+      content: formattedResponse,
     });
 
     await chat.save();
 
-    res.write(`data: ${JSON.stringify({ chatId: chat._id })}\n\n`);
+    res.write(`data: ${JSON.stringify({ chatId: chat._id, formattedResponse: formattedResponse })}\n\n`);
     res.end();
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -63,6 +65,17 @@ async function sendMessage(message, res, chat, language) {
   catch (err) {
     console.error(`Error: ${err}`);
   }
+}
+
+function formatAssistantResponse(response) {
+  const parts = response.split('```');
+  const formattedParts = parts.map((part, index) => {
+    if (index % 2 !== 0) {
+      return `<pre class="code-block">${part}</pre>`;
+    }
+    return part;
+  });
+  return formattedParts.join('');
 }
 
 const summarizeChat = async (messages) => {
@@ -82,7 +95,7 @@ const summarizeChat = async (messages) => {
     model: 'meta-llama/Llama-3-70b-chat-hf',
     max_tokens: 4,
   });
-  
+
   const summary = response.choices[0].message.content;
   const strippedSummary = summary.replace(/['"]+/g, '');
 

@@ -154,6 +154,7 @@
             if (value.startsWith('data: ')) {
               const data = JSON.parse(value.slice(6));
               const newChatId = data.chatId;
+              const formattedResponse = data.formattedResponse;
               const newChatLanguage = selectedLanguage;
               const newChatLanguageLogo = document.querySelector(`.dropdown-menu a[data-language="${newChatLanguage}"] img`).getAttribute('src');
 
@@ -183,6 +184,7 @@
                 recentChatsList.insertBefore(newChatItem, recentChatsList.firstChild);
               }
               chatId = newChatId;
+              assistantMessageContentElement.innerHTML = formattedResponse;
             }
             else {
               assistantMessageContentElement.innerHTML += value;

@@ -37,12 +37,15 @@ p {
     border-color: white;
     color: white;
 }
+
 .form-control::placeholder {
     color: #ccc;
 }
+
 #login {
     background-color: #01040A;
 }
+
 .login-option {
     background-color: #151A21;
     border-radius: 5px;
@@ -52,18 +55,22 @@ p {
     align-items: center;
     margin-bottom: 15px;
 }
+
 a.login-option {
     text-decoration: none;
 }
+
 .login-option img {
     width: 20px;
     height: 20px;
     margin-right: 10px;
 }
+
 .login-option span {
     color: #fff;
     font-weight: bold;
 }
+
 .custom-row {
     width: 350px;
     margin: 0 auto;
@@ -84,11 +91,9 @@ body {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -60%);
-    background-image: linear-gradient(
-        to top left,
-        rgb(192 38 211 / 0.5),
-        rgb(251 191 36 / 0.5)
-    ) !important;
+    background-image: linear-gradient(to top left,
+            rgb(192 38 211 / 0.5),
+            rgb(251 191 36 / 0.5)) !important;
     filter: blur(250px);
     border-radius: 50%;
     z-index: -1;
@@ -448,7 +453,7 @@ li:last-child .dropdown-item {
     z-index: 1000;
 }
 
-.fixed-sidebar:hover ~ .dropdown #languageDropdown {
+.fixed-sidebar:hover~.dropdown #languageDropdown {
     left: 270px;
 }
 
@@ -481,6 +486,7 @@ li:last-child .dropdown-item {
         opacity: 0;
         transform: translateY(20px);
     }
+
     100% {
         opacity: 1;
         transform: translateY(0);
@@ -803,4 +809,12 @@ li:last-child .dropdown-item {
 .btn-custom small {
     font-size: 0.8rem;
     display: block;
+}
+
+.message-content .code-block {
+    background-color: black;
+    color: #fff;
+    margin-top: 20px;
+    padding: 10px;
+    border-radius: 5px;
 }
