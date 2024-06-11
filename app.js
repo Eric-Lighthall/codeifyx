@@ -20,10 +20,12 @@ connectDB();
 
 const app = express();
 
+// use morgan in dev environment for logging
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
 
+// https redirect
 if (process.env.NODE_ENV === 'production') {
     app.use((req, res, next) => {
         if (req.header('x-forwarded-proto') !== 'https') {

@@ -25,6 +25,7 @@ router.post('/register', async (req, res) => {
     }
 
     try {
+        // create a new user instance
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({
             displayName: username,
@@ -32,7 +33,9 @@ router.post('/register', async (req, res) => {
             password: hashedPassword,
         });
 
+        // save new user to database
         await newUser.save();
+
         res.redirect('/login');
     } catch (err) {
         console.error(err);
@@ -43,8 +46,8 @@ router.post('/register', async (req, res) => {
 // @desc Login user
 // @route POST /auth/login
 router.post('/login', passport.authenticate('local', {
-    successRedirect: '/chat',
-    failureRedirect: '/login',
+    successRedirect: '/chat', // redirect to chat page on successful login
+    failureRedirect: '/login', // redirect to login page on failed login
 }));
 
 // @desc    Logout user

@@ -1,20 +1,19 @@
 const openai = require('openai');
-const prettier = require('prettier');
 
+// create togetherapi client
 const client = new openai({
   apiKey: process.env.TOGETHER_API_KEY,
   baseURL: 'https://api.together.xyz/v1',
 });
 
+// send message & generate response
 async function sendMessage(message, res, chat, language) {
   try {
-
+    // build conversation history before sending to api
     const conversationHistory = chat.messages.map((msg) => ({
       role: msg.role,
       content: msg.content,
     }));
-
-    console.log(language);
 
     const stream = await client.chat.completions.create({
       messages: [
@@ -48,6 +47,7 @@ async function sendMessage(message, res, chat, language) {
       res.write(token);
     }
 
+    // format response for code blocks
     const formattedResponse = formatAssistantResponse(assistantResponse);
 
     chat.messages.push({
@@ -67,6 +67,7 @@ async function sendMessage(message, res, chat, language) {
   }
 }
 
+// format code blocks
 function formatAssistantResponse(response) {
   const parts = response.split('```');
   const formattedParts = parts.map((part, index) => {
@@ -78,6 +79,7 @@ function formatAssistantResponse(response) {
   return formattedParts.join('');
 }
 
+// generate a summary of the chat using Llama-3-70b
 const summarizeChat = async (messages) => {
   const conversationHistory = messages.map(msg => ({
     role: msg.role,
@@ -96,6 +98,7 @@ const summarizeChat = async (messages) => {
     max_tokens: 4,
   });
 
+  // extract summary and rempove quotes
   const summary = response.choices[0].message.content;
   const strippedSummary = summary.replace(/['"]+/g, '');
 
