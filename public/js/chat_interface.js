@@ -6,7 +6,7 @@ const emptyState = document.querySelector('.empty-state');
 let chatId = chatIdInput.value;
 
 messageInput.addEventListener('keypress', async (event) => {
-  if (event.key === 'Enter') {
+  if (event.key === 'Enter' && messageInput.value != '') {
     const userMessage = messageInput.value;
     messageInput.value = '';
     addMessageToChat('user', userMessage);
