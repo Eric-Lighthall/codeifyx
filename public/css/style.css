@@ -578,6 +578,7 @@ li:last-child .dropdown-item {
     border: none;
     padding: 5px 0;
     margin-top: 10px;
+    border-radius: 5px;
 }
 
 .recent-chat-link {
@@ -647,6 +648,10 @@ li:last-child .dropdown-item {
 
 .fixed-sidebar:not(:hover) .delete-chat-btn {
     display: none;
+}
+
+.fixed-sidebar:hover .delete-chat-btn {
+    margin-right: 5%;
 }
 
 .chat-list {
