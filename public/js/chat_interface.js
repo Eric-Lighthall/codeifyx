@@ -5,6 +5,7 @@ const emptyState = document.querySelector('.empty-state');
 
 let chatId = chatIdInput.value;
 
+// on message enter
 messageInput.addEventListener('keypress', async (event) => {
   if (event.key === 'Enter' && messageInput.value != '') {
     const userMessage = messageInput.value;
@@ -86,6 +87,7 @@ messageInput.addEventListener('keypress', async (event) => {
   }
 });
 
+// append user or AI message to the chat window
 function addMessageToChat(role, content) {
   const messageElement = document.createElement('div');
   messageElement.classList.add('message');
@@ -130,6 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
   chatContainer.scrollTop = chatContainer.scrollHeight;
 
+
   languageDropdownItems.forEach(item => {
     item.addEventListener('click', function (event) {
       event.preventDefault();
@@ -143,6 +146,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 
+  // trash buttons for delete
   const recentChatsList = document.querySelector('.recent-chats-list');
   recentChatsList.addEventListener('click', async function (event) {
     if (event.target.closest('.delete-chat-btn')) {

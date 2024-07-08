@@ -41,6 +41,7 @@ async function sendMessage(message, res, chat, language) {
 
     let assistantResponse = '';
 
+    // loop through each chunk as its streamed in
     for await (const chunk of stream) {
       const token = chunk.choices[0].text;
       assistantResponse += token;
