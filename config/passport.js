@@ -10,30 +10,30 @@ module.exports = function (passport) {
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
         callbackURL: '/auth/google/callback'
     },
-    async (accessToken, refreshToken, profile, done) => {
-        const newUser = {
-            googleId: profile.id,
-            displayName: profile.displayName,
-            firstName: profile.name.givenName,
-            lastName: profile.name.familyName,
-            image: profile.photos[0].value
-        }
-
-        try {
-            let user = await User.findOne({ googleId: profile.id })
-
-            if (user) {
-                done(null, user);
+        async (accessToken, refreshToken, profile, done) => {
+            const newUser = {
+                googleId: profile.id,
+                displayName: profile.displayName,
+                firstName: profile.name.givenName,
+                lastName: profile.name.familyName,
+                image: profile.photos[0].value
             }
-            else {
-                user = await User.create(newUser);
-                done(null, user);
+
+            try {
+                let user = await User.findOne({ googleId: profile.id })
+
+                if (user) {
+                    done(null, user);
+                }
+                else {
+                    user = await User.create(newUser);
+                    done(null, user);
+                }
             }
-        }
-        catch (err) {
-            console.error(err);
-        }
-    }));
+            catch (err) {
+                console.error(err);
+            }
+        }));
 
     passport.use(new LocalStrategy(
         { usernameField: 'email' },
@@ -47,6 +47,11 @@ module.exports = function (passport) {
                 const isMatch = await bcrypt.compare(password, user.password);
                 if (!isMatch) {
                     return done(null, false, { message: 'Incorrect password.' });
+                }
+
+                // Check user is verified
+                if (!user.isVerified) {
+                    return done(null, false, { message: 'Please verify your email before logging in.' });
                 }
 
                 return done(null, user);

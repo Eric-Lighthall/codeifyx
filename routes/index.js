@@ -193,4 +193,8 @@ router.delete('/api/chat/:id', ensureAuth, async (req, res) => {
   }
 });
 
+router.get('/verification-sent', (req, res) => {
+  res.render('verification_sent');
+});
+
 module.exports = router;

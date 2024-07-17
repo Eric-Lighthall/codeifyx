@@ -4,15 +4,15 @@ const mailgun = new Mailgun(formData);
 
 const mg = mailgun.client({
     username: 'api',
-    key: config.env.MAILGUN_API_KEY
+    key: process.env.MAILGUN_API_KEY
 });
 
-const DOMAIN = config.env.MAILGUN_DOMAIN;
+const DOMAIN = process.env.MAILGUN_DOMAIN;
 
 const sendEmail = async (to, subject, text, html) => {
     try {
         const msg = await mg.messages.create(DOMAIN, {
-            from: "Codeifyx <mailgun@sandboxdb27a3b3f3e84a77a5291b26bfdfaee8.mailgun.org>",
+            from: "Codeifyx <mailgun@codeifyx.com>",
             to: [to],
             subject: subject,
             text: text,

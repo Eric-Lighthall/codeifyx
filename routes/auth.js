@@ -3,6 +3,7 @@ const passport = require('passport');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const crypto = require('crypto');
+const sendEmail = require('../utils/send_email');
 const router = express.Router();
 
 // @desc    Auth with Google
@@ -22,14 +23,14 @@ router.post('/register', async (req, res) => {
     const { username, email, password, confirmPassword } = req.body;
 
     if (password !== confirmPassword) {
-        return res.redirect('/register');
+        return res.redirect('/register?error=passwordMismatch');
     }
 
     try {
         // TODO: Notify user if an account with the email already exists
         const existingUser = await User.findOne({ email });
         if (existingUser) {
-            return res.redirect('/register');
+            return res.redirect('/register?error=emailInUse');
         }
 
         // create a new user instance
@@ -58,16 +59,53 @@ router.post('/register', async (req, res) => {
         res.redirect('/verification-sent');
     } catch (err) {
         console.error(err);
-        res.redirect('/register');
+        res.redirect('/register?error=serverError');
+    }
+});
+
+// @desc Verify user
+router.get('/verify/:token', async (req, res) => {
+    try {
+        const user = await User.findOne({ verificationToken: req.params.token });
+        if (!user) {
+            return res.status(400).send('Invalid or expired token');
+        }
+
+        user.isVerified = true;
+        user.verificationToken = undefined;
+        await user.save();
+
+        res.redirect('/login?verified=true');
+    } catch (err) {
+        console.error(err);
+        res.status(500).send('Server error');
     }
 });
 
 // @desc Login user
 // @route POST /auth/login
-router.post('/login', passport.authenticate('local', {
-    successRedirect: '/chat', // redirect to chat page on successful login
-    failureRedirect: '/login', // redirect to login page on failed login
-}));
+router.post('/login', (req, res, next) => {
+    passport.authenticate('local', (err, user, info) => {
+        if (err) {
+            return next(err);
+        }
+        if (!user) {
+            // Authentication failed
+            return res.redirect('/login?error=invalidCredentials');
+        }
+        if (!user.isVerified) {
+            // User exists but isn't verified
+            return res.redirect('/login?error=notVerified');
+        }
+        // User is authenticated and verified
+        req.logIn(user, (err) => {
+            if (err) {
+                return next(err);
+            }
+            return res.redirect('/chat');
+        });
+    })(req, res, next);
+});
 
 // @desc    Logout user
 // @route   /auth/logout
