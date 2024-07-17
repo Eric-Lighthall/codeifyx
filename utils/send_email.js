@@ -12,7 +12,7 @@ const DOMAIN = process.env.MAILGUN_DOMAIN;
 const sendEmail = async (to, subject, text, html) => {
     try {
         const msg = await mg.messages.create(DOMAIN, {
-            from: "Codeifyx <mailgun@codeifyx.com>",
+            from: "Codeifyx <verification@codeifyx.com>",
             to: [to],
             subject: subject,
             text: text,
