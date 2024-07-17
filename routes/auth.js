@@ -2,6 +2,7 @@ const express = require('express');
 const passport = require('passport');
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
+const crypto = require('crypto');
 const router = express.Router();
 
 // @desc    Auth with Google
@@ -25,18 +26,36 @@ router.post('/register', async (req, res) => {
     }
 
     try {
+        // TODO: Notify user if an account with the email already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.redirect('/register');
+        }
+
         // create a new user instance
         const hashedPassword = await bcrypt.hash(password, 10);
+        const verificationToken = crypto.randomBytes(20).toString('hex');
+
         const newUser = new User({
             displayName: username,
             email,
             password: hashedPassword,
+            isVerified: false,
+            verificationToken
         });
 
         // save new user to database
         await newUser.save();
 
-        res.redirect('/login');
+        const verificationLink = `https://codeifyx.com/verify/${verificationToken}`;
+        await sendEmail(
+            email,
+            'Verify Your Email',
+            `Please click this link to verify your email: ${verificationLink}`,
+            `<p>Please click this link to verify your email: <a href="${verificationLink}">${verificationLink}</a></p>`
+        );
+
+        res.redirect('/verification-sent');
     } catch (err) {
         console.error(err);
         res.redirect('/register');
