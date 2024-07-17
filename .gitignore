@@ -1,7 +1,2 @@
 current_express_app/node_modules
 current_express_app/config/config.env
-
-# Next.js
-codeifyx-next/.next/
-codeifyx-next/out/
-codeifyx-next/node_modules/
