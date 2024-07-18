@@ -2,32 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+@layer base {
+    body {
+        @apply bg-[#0f172a] text-white;
+        font-family: "Roboto", sans-serif !important;
+    }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
+@layer components {
+    .gradient-container {
+        @apply w-[700px] h-[700px] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-[60%] rounded-full z-[-1];
+        background-image: linear-gradient(
+            to top left,
+            rgba(192, 38, 211, 0.5),
+            rgba(251, 191, 36, 0.5)
+        ) !important;
+        filter: blur(250px);
+    }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
+    .main-text {
+        @apply text-6xl font-bold;
+    }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+    #typed-text {
+        @apply bg-gradient-to-br from-[#e69f57] via-[#e0727a] to-[#bd3fb1] bg-clip-text text-transparent inline-block pb-[0.2em] leading-[1.2];
+    }
+
+    .text-slightly-gray {
+        @apply text-white text-opacity-70;
+    }
+
+    .btn-warning {
+        @apply bg-yellow-500 text-white font-bold py-3 px-6 rounded hover:bg-yellow-600 transition-colors duration-300;
+    }
+
+    .image-container {
+        @apply relative inline-block;
+    }
+
+    .image-container::before {
+        content: "";
+        @apply absolute -top-[10px] -left-[10px] -right-[10px] -bottom-[10px] rounded-[25px] z-[-1];
+        background: url("/images/codeifyxshowcase.png") no-repeat center/cover;
+        filter: blur(20px);
+    }
+
+    .headline {
+        @apply text-4xl font-bold;
+    }
+
+    .btn-primary {
+        @apply bg-blue-500 text-white font-bold py-2 px-4 rounded hover:bg-blue-600 transition-colors duration-300;
+    }
 }

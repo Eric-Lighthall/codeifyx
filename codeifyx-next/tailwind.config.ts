@@ -19,6 +19,9 @@ const config: Config = {
       blur: {
         '3xl': '64px',
       },
+      fontFamily: {
+        sans: ['Roboto', 'sans-serif'],
+      },
     },
   },
   plugins: [],
