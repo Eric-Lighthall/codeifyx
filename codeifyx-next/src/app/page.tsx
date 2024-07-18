@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <main className="container mx-auto px-4">
       <div className="gradient-container"></div>
-      <div className="text-center">
+      <div className="text-center text-white pt-20 md:pt-16">
         <h1 className="text-4xl font-bold mb-2">A Better Way To</h1>
         <h1 className="text-4xl font-bold mb-8">
           <TypedText />

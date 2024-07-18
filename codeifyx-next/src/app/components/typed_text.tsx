@@ -21,5 +21,9 @@ export default function TypedText() {
     };
   }, []);
 
-  return <span ref={el}></span>;
+  return (
+    <div className="h-[1.5em] flex items-center justify-center">
+      <span ref={el} className="text-5xl font-bold bg-gradient-to-br from-[#e69f57] via-[#e0727a] to-[#bd3fb1] text-transparent bg-clip-text"></span>
+    </div>
+  );
 }
