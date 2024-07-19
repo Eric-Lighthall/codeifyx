@@ -5,9 +5,9 @@ import Header from './header'
 
 export default function HeaderWrapper() {
   const pathname = usePathname()
-  const isSignUpPage = pathname === '/signup'
+  const isAuthPage = pathname === '/signup' || pathname === '/login'
 
-  if (isSignUpPage) {
+  if (isAuthPage) {
     return null
   }
 
