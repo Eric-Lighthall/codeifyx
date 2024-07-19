@@ -1,6 +1,6 @@
 import './globals.css'
 import { Inter } from 'next/font/google'
-import Header from './components/header'
+import HeaderWrapper from './components/header_wrapper'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -22,7 +22,7 @@ export default function RootLayout({
         <script src="https://unpkg.com/scrollreveal"></script>
       </head>
       <body className={`${inter.className} bg-gray-900 text-white`}>
-        <Header />
+        <HeaderWrapper />
         <main className="container mx-auto px-4 mt-6">
           {children}
         </main>
