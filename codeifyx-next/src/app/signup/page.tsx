@@ -18,7 +18,7 @@ export default function SignUp() {
       <div className="w-full max-w-md">
         <div className="bg-gray-900 shadow-lg rounded-lg px-8 pt-6 pb-8 mb-4">
           <h1 className="text-3xl font-bold text-center mb-6 text-white">Create an Account</h1>
-          <form action="/auth/register" method="POST">
+          <form action="/api/auth/register" method="POST">
             <div className="mb-4">
               <input
                 type="text"

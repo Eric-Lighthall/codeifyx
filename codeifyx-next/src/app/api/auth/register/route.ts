@@ -1,34 +1,32 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { connectDB } from '../../../../utils/dbConnect'
-import User from '../../../../models/User'
+import { NextRequest, NextResponse } from 'next/server'
+import { connectDB } from '@/utils/db'
+import User from '@/models/User'
 import bcrypt from 'bcryptjs'
 import crypto from 'crypto'
-import { sendEmail } from '../../../../utils/send_email'
+import sendEmail from '@/utils/email'
 
-type Data = {
-  message: string
-}
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ message: 'Method not allowed' })
-  }
-
+export async function POST(request: NextRequest) {
   await connectDB()
 
-  const { username, email, password, confirmPassword } = req.body
+  let body;
+  const contentType = request.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    body = await request.json();
+  } else {
+    const formData = await request.formData();
+    body = Object.fromEntries(formData);
+  }
+
+  const { username, email, password, confirmPassword } = body;
 
   if (password !== confirmPassword) {
-    return res.status(400).json({ message: 'Passwords do not match' })
+    return NextResponse.json({ message: 'Passwords do not match' }, { status: 400 })
   }
 
   try {
     const existingUser = await User.findOne({ email })
     if (existingUser) {
-      return res.status(400).json({ message: 'Email already in use' })
+      return NextResponse.json({ message: 'Email already in use' }, { status: 400 })
     }
 
     const hashedPassword = await bcrypt.hash(password, 10)
@@ -49,12 +47,12 @@ export default async function handler(
       email,
       'Verify Your Email',
       `Please click this link to verify your email: ${verificationLink}`,
-      `<p>Please click this link to verify your email: <a href="${verificationLink}">${verificationToken}</a></p>`
+      `<p>Please click this link to verify your email: <a href="${verificationLink}">${verificationLink}</a></p>`
     )
 
-    res.status(201).json({ message: 'User registered successfully' })
+    return NextResponse.json({ message: 'User registered successfully. Please check your email to verify your account.' }, { status: 201 })
   } catch (err) {
     console.error(err)
-    res.status(500).json({ message: 'Server error' })
+    return NextResponse.json({ message: 'Server error' }, { status: 500 })
   }
 }
