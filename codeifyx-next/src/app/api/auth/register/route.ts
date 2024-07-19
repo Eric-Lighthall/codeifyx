@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
 
     await newUser.save()
 
-    const verificationLink = `https://codeifyx.com/verify/${verificationToken}`
+    const verificationLink = `https://codeifyx.com/api/auth/verify/${verificationToken}`
     await sendEmail(
       email,
       'Verify Your Email',
