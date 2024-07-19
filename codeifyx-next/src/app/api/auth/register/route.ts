@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
       `<p>Please click this link to verify your email: <a href="${verificationLink}">${verificationLink}</a></p>`
     )
 
-    return NextResponse.json({ message: 'User registered successfully. Please check your email to verify your account.' }, { status: 201 })
+    return NextResponse.redirect(new URL('/verification-sent', request.url))
   } catch (err) {
     console.error(err)
     return NextResponse.json({ message: 'Server error' }, { status: 500 })
