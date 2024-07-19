@@ -15,15 +15,15 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <head>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
         <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet" />
         <script src="https://unpkg.com/scrollreveal"></script>
       </head>
-      <body className={`${inter.className} bg-gray-900 text-white`}>
+      <body className={`${inter.className} bg-gray-900 text-white min-h-screen flex flex-col`}>
         <HeaderWrapper />
-        <main className="container mx-auto px-4 mt-6">
+        <main className="flex-grow">
           {children}
         </main>
       </body>
