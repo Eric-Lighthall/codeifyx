@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import TypedText from './components/typed_text';
+import TypedText from '../components/typed_text';
 
 export default function Home() {
   return (
