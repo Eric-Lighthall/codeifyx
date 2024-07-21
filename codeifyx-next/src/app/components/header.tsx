@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { LogOut, Settings, X, Trash2, AlertTriangle } from 'lucide-react'
+import { LogOut, Settings, User, X, Trash2, AlertTriangle } from 'lucide-react'
 
 interface User {
   email: string;
@@ -115,7 +115,8 @@ export default function Header() {
         setIsConfirmDeleteOpen(false);
         window.location.href = '/';
       } else {
-        console.error('Account deletion failed');
+        const data = await res.text();
+        console.error('Account deletion failed:', data);
       }
     } catch (error) {
       console.error('Account deletion error:', error);
@@ -144,9 +145,10 @@ export default function Header() {
                   <div className="relative" ref={dropdownRef}>
                     <button 
                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                      className="text-white hover:text-yellow-400 flex items-center space-x-1"
+                      className="text-white hover:text-yellow-400 flex items-center space-x-2"
                     >
-                      <span>{userEmail}</span>
+                      <User className="w-5 h-5" />
+                      <span className="text-sm font-medium">My Account</span>
                       <svg className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
                       </svg>
@@ -193,7 +195,6 @@ export default function Header() {
               {loading ? null : (
                 userEmail ? (
                   <>
-                    <span className="block py-2 text-white">{userEmail}</span>
                     <button
                       onClick={() => setIsSettingsOpen(true)}
                       className="flex items-center w-full py-2 text-white hover:text-yellow-400"
