@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
 import { connectDB } from '@/utils/db';
 import User from '@/models/User';
+import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
   await connectDB();
@@ -9,7 +9,10 @@ export async function GET(request: NextRequest) {
   const token = request.cookies.get('token')?.value;
 
   if (!token) {
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    return new NextResponse(JSON.stringify({ message: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 
   try {
@@ -17,12 +20,21 @@ export async function GET(request: NextRequest) {
     const user = await User.findById(decoded.userId).select('-password');
 
     if (!user) {
-      return NextResponse.json({ message: 'User not found' }, { status: 404 });
+      return new NextResponse(JSON.stringify({ message: 'User not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+      });
     }
 
-    return NextResponse.json({ email: user.email }, { status: 200 });
+    return new NextResponse(JSON.stringify({ email: user.email }), {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' }
+    });
   } catch (error) {
     console.error('Auth error:', error);
-    return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
+    return new NextResponse(JSON.stringify({ message: 'Unauthorized' }), {
+      status: 401,
+      headers: { 'Content-Type': 'application/json' }
+    });
   }
 }
