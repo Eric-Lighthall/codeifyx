@@ -1,7 +1,7 @@
 // app/(protected)/chat/page.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import ChatInterface from '../../components/ChatInterface';
 import Sidebar from '../../components/Sidebar';
@@ -24,8 +24,6 @@ const ChatPage: React.FC = () => {
   const [chatDetails, setChatDetails] = useState<ChatDetails | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const headerRef = useRef<HTMLDivElement>(null);
-  const [chatInterfaceHeight, setChatInterfaceHeight] = useState<number | null>(null);
 
   const fetchChatDetails = useCallback(async (id: string) => {
     if (!id) return;
@@ -55,21 +53,6 @@ const ChatPage: React.FC = () => {
     }
   }, [searchParams, fetchChatDetails]);
 
-  useEffect(() => {
-    const updateHeight = () => {
-      if (headerRef.current) {
-        const windowHeight = window.innerHeight;
-        const headerHeight = headerRef.current.offsetHeight;
-        setChatInterfaceHeight(windowHeight - headerHeight);
-      }
-    };
-
-    updateHeight();
-    window.addEventListener('resize', updateHeight);
-
-    return () => window.removeEventListener('resize', updateHeight);
-  }, []);
-
   const handleNewChat = useCallback((newChatId: string) => {
     router.push(`/chat?id=${newChatId}`);
     fetchChatDetails(newChatId);
@@ -85,28 +68,21 @@ const ChatPage: React.FC = () => {
   return (
     <div className="flex h-screen bg-gray-900 text-white">
       <Sidebar onNewChat={handleNewChat} />
-      <div className="flex-1 flex flex-col">
-        <div ref={headerRef} className="p-4 bg-gray-800">
-          <h1 className="text-2xl font-bold">
-            {chatDetails ? chatDetails.title : 'New Chat'}
-          </h1>
-          {chatDetails && <p>Language: {chatDetails.language}</p>}
-        </div>
-        {chatInterfaceHeight && (
-          <div style={{ height: `${chatInterfaceHeight}px` }} className="flex-1 overflow-hidden">
-            {isLoading ? (
-              <div className="text-center mt-10">Loading...</div>
-            ) : error ? (
-              <div className="text-center mt-10 text-red-500">{error}</div>
-            ) : (
-              <ChatInterface 
-                chatDetails={chatDetails}
-                onNewChat={handleNewChat}
-                updateChatDetails={updateChatDetails}
-                height={chatInterfaceHeight}
-              />
-            )}
+      <div className="flex-1 overflow-hidden">
+        {isLoading ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center">Loading...</div>
           </div>
+        ) : error ? (
+          <div className="flex items-center justify-center h-full">
+            <div className="text-center text-red-500">{error}</div>
+          </div>
+        ) : (
+          <ChatInterface 
+            chatDetails={chatDetails}
+            onNewChat={handleNewChat}
+            updateChatDetails={updateChatDetails}
+          />
         )}
       </div>
     </div>

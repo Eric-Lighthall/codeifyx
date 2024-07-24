@@ -1,4 +1,3 @@
-// components/ChatInterface.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { ChatDetails, Message } from '../../app/(protected)/chat/page';
@@ -7,10 +6,9 @@ interface ChatInterfaceProps {
   chatDetails: ChatDetails | null;
   onNewChat: (newChatId: string) => void;
   updateChatDetails: (updater: (prevDetails: ChatDetails | null) => Partial<ChatDetails>) => void;
-  height: number;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, updateChatDetails, height }) => {
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, updateChatDetails }) => {
   const [input, setInput] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -103,47 +101,51 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
   };
 
   return (
-    <div className="flex flex-col" style={{ height: `${height}px` }}>
+    <div className="flex flex-col h-full">
       <div 
         ref={messageContainerRef}
-        className="flex-1 overflow-y-auto p-4 space-y-4"
+        className="flex-1 overflow-y-auto py-4 px-6 md:px-12 lg:px-24"
       >
-        {(!chatDetails || chatDetails.messages.length === 0) ? (
-          <div className="flex flex-col items-center justify-center h-full">
-            <Image src="/images/codeifyxlogosmall.webp" alt="CodeifyX Logo" width={50} height={50} className="mb-3" />
-            <h3 className="font-bold text-xl">What can I help you with?</h3>
-            <p className="text-gray-400 mt-2">Ask me anything about {chatDetails?.language || 'programming'}!</p>
-          </div>
-        ) : (
-          chatDetails.messages.map((message: Message, index: number) => (
-            <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-3/4 p-3 rounded-lg ${message.role === 'user' ? 'bg-blue-600' : 'bg-gray-700'}`}>
-                <div dangerouslySetInnerHTML={{ __html: message.content }} />
-              </div>
+        <div className="max-w-3xl mx-auto space-y-6">
+          {(!chatDetails || chatDetails.messages.length === 0) ? (
+            <div className="flex flex-col items-center justify-center h-full">
+              <Image src="/images/codeifyxlogosmall.webp" alt="CodeifyX Logo" width={50} height={50} className="mb-3" />
+              <h3 className="font-bold text-xl">What can I help you with?</h3>
+              <p className="text-gray-400 mt-2">Ask me anything about {chatDetails?.language || 'programming'}!</p>
             </div>
-          ))
-        )}
-        <div ref={messagesEndRef} />
-      </div>
-      <form onSubmit={handleSubmit} className="p-4 bg-gray-800">
-        <div className="flex">
-          <input
-            type="text"
-            value={input}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
-            className="flex-1 bg-gray-700 text-white rounded-l-lg px-4 py-2 focus:outline-none"
-            placeholder={`Type your ${chatDetails?.language || 'programming'} related message...`}
-            disabled={isLoading}
-          />
-          <button 
-            type="submit" 
-            className="bg-blue-600 text-white rounded-r-lg px-4 py-2 disabled:bg-blue-400" 
-            disabled={isLoading}
-          >
-            {isLoading ? 'Sending...' : 'Send'}
-          </button>
+          ) : (
+            chatDetails.messages.map((message: Message, index: number) => (
+              <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[80%] p-4 rounded-lg ${message.role === 'user' ? 'bg-blue-600' : 'bg-gray-700'}`}>
+                  <div dangerouslySetInnerHTML={{ __html: message.content }} />
+                </div>
+              </div>
+            ))
+          )}
+          <div ref={messagesEndRef} />
         </div>
-      </form>
+      </div>
+      <div className="bg-gray-800 py-4 px-6 md:px-12 lg:px-24">
+        <form onSubmit={handleSubmit} className="max-w-3xl mx-auto">
+          <div className="flex">
+            <input
+              type="text"
+              value={input}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
+              className="flex-1 bg-gray-700 text-white rounded-l-lg px-4 py-2 focus:outline-none"
+              placeholder={`Type your ${chatDetails?.language || 'programming'} related message...`}
+              disabled={isLoading}
+            />
+            <button 
+              type="submit" 
+              className="bg-blue-600 text-white rounded-r-lg px-4 py-2 disabled:bg-blue-400" 
+              disabled={isLoading}
+            >
+              {isLoading ? 'Sending...' : 'Send'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
