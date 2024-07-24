@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
     }
 
     let chat;
+    let isNewChat = false;
 
     if (chatId) {
       chat = await Chat.findOne({ _id: chatId, user: user._id });
@@ -42,16 +43,16 @@ export async function POST(req: NextRequest) {
     } else {
       chat = new Chat({
         user: user._id,
-        title: `New ${language} Chat`,  // Set default title
+        title: `New ${language} Chat`,
         language,
         messages: [{
           role: 'user',
           content: message,
         }],
       });
+      isNewChat = true;
     }
 
-    // Ensure title is set
     if (!chat.title) {
       chat.title = `Chat ${new Date().toISOString()}`;
     }
@@ -95,15 +96,18 @@ export async function POST(req: NextRequest) {
             content: formattedResponse,
           });
 
-          if (!chatId) {
-            // Generate a proper title after getting the response
+          if (isNewChat) {
             const summary = await summarizeChat(chat.messages);
             chat.title = summary || `Chat ${new Date().toISOString()}`;
           }
 
           await chat.save();
 
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ chatId: chat._id, formattedResponse })}\n\n`));
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
+            chatId: chat._id, 
+            newChatId: isNewChat ? chat._id : undefined,
+            assistantMessage: formattedResponse 
+          })}\n\n`));
         } catch (error) {
           console.error('Error in stream processing:', error);
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ error: 'An error occurred during processing' })}\n\n`));
