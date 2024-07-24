@@ -6,33 +6,42 @@ import { ChatDetails, Message } from '../../app/(protected)/chat/page';
 interface ChatInterfaceProps {
   chatDetails: ChatDetails | null;
   onNewChat: (newChatId: string) => void;
+  updateChatDetails: (updater: (prevDetails: ChatDetails | null) => Partial<ChatDetails>) => void;
+  height: number;
 }
 
-const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat }) => {
-  const [messages, setMessages] = useState<Message[]>(chatDetails?.messages || []);
+const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, updateChatDetails, height }) => {
   const [input, setInput] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (chatDetails) {
-      setMessages(chatDetails.messages);
-    } else {
-      setMessages([]);
+    scrollToBottom();
+  }, [chatDetails?.messages]);
+
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [chatDetails]);
-
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (input.trim() && !isLoading) {
       const userMessage: Message = { role: 'user', content: input };
-      setMessages(prevMessages => [...prevMessages, userMessage]);
+      updateChatDetails(prevDetails => ({ 
+        messages: [...(prevDetails?.messages || []), userMessage]
+      }));
       setInput('');
       setIsLoading(true);
+
+      updateChatDetails(prevDetails => ({
+        messages: [
+          ...(prevDetails?.messages || []),
+          { role: 'assistant', content: '' }
+        ]
+      }));
 
       try {
         const response = await fetch('/api/chat', {
@@ -62,28 +71,31 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat })
               const data = JSON.parse(line.slice(5));
               if (data.token) {
                 assistantMessage += data.token;
-                setMessages(prevMessages => {
-                  const updatedMessages = [...prevMessages];
-                  const lastMessage = updatedMessages[updatedMessages.length - 1];
-                  if (lastMessage.role === 'assistant') {
-                    lastMessage.content = assistantMessage;
-                  } else {
-                    updatedMessages.push({ role: 'assistant', content: assistantMessage });
-                  }
-                  return updatedMessages;
+                updateChatDetails(prevDetails => {
+                  const updatedMessages = [...(prevDetails?.messages || [])];
+                  updatedMessages[updatedMessages.length - 1] = {
+                    role: 'assistant',
+                    content: assistantMessage
+                  };
+                  return { messages: updatedMessages };
                 });
+                scrollToBottom();
               } else if (data.newChatId) {
-                onNewChat(data.newChatId);  // This line calls the parent component to update the URL
+                onNewChat(data.newChatId);
               }
             }
           }
         }
       } catch (error) {
         console.error('Error:', error);
-        setMessages(prevMessages => [
-          ...prevMessages,
-          { role: 'assistant', content: 'Sorry, an error occurred. Please try again.' },
-        ]);
+        updateChatDetails(prevDetails => {
+          const updatedMessages = [...(prevDetails?.messages || [])];
+          updatedMessages[updatedMessages.length - 1] = {
+            role: 'assistant',
+            content: 'Sorry, an error occurred. Please try again.'
+          };
+          return { messages: updatedMessages };
+        });
       } finally {
         setIsLoading(false);
       }
@@ -91,17 +103,20 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat })
   };
 
   return (
-    <div className="flex-1 flex flex-col">
-      <div className="flex-1 overflow-y-auto p-4">
-        {messages.length === 0 ? (
+    <div className="flex flex-col" style={{ height: `${height}px` }}>
+      <div 
+        ref={messageContainerRef}
+        className="flex-1 overflow-y-auto p-4 space-y-4"
+      >
+        {(!chatDetails || chatDetails.messages.length === 0) ? (
           <div className="flex flex-col items-center justify-center h-full">
             <Image src="/images/codeifyxlogosmall.webp" alt="CodeifyX Logo" width={50} height={50} className="mb-3" />
             <h3 className="font-bold text-xl">What can I help you with?</h3>
             <p className="text-gray-400 mt-2">Ask me anything about {chatDetails?.language || 'programming'}!</p>
           </div>
         ) : (
-          messages.map((message, index) => (
-            <div key={index} className={`flex mb-4 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+          chatDetails.messages.map((message: Message, index: number) => (
+            <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-3/4 p-3 rounded-lg ${message.role === 'user' ? 'bg-blue-600' : 'bg-gray-700'}`}>
                 <div dangerouslySetInnerHTML={{ __html: message.content }} />
               </div>
@@ -110,13 +125,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat })
         )}
         <div ref={messagesEndRef} />
       </div>
-      <form onSubmit={handleSubmit} className="p-4">
+      <form onSubmit={handleSubmit} className="p-4 bg-gray-800">
         <div className="flex">
           <input
             type="text"
             value={input}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInput(e.target.value)}
-            className="flex-1 bg-gray-800 text-white rounded-l-lg px-4 py-2 focus:outline-none"
+            className="flex-1 bg-gray-700 text-white rounded-l-lg px-4 py-2 focus:outline-none"
             placeholder={`Type your ${chatDetails?.language || 'programming'} related message...`}
             disabled={isLoading}
           />

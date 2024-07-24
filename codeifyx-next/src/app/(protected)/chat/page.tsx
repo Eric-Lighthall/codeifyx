@@ -1,8 +1,8 @@
 // app/(protected)/chat/page.tsx
 "use client";
 
-import React, { useState, useEffect, useCallback } from 'react';
-import { useSearchParams } from 'next/navigation';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import ChatInterface from '../../components/ChatInterface';
 import Sidebar from '../../components/Sidebar';
 
@@ -19,10 +19,13 @@ export interface ChatDetails {
 }
 
 const ChatPage: React.FC = () => {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const [chatDetails, setChatDetails] = useState<ChatDetails | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const [chatInterfaceHeight, setChatInterfaceHeight] = useState<number | null>(null);
 
   const fetchChatDetails = useCallback(async (id: string) => {
     if (!id) return;
@@ -52,31 +55,58 @@ const ChatPage: React.FC = () => {
     }
   }, [searchParams, fetchChatDetails]);
 
+  useEffect(() => {
+    const updateHeight = () => {
+      if (headerRef.current) {
+        const windowHeight = window.innerHeight;
+        const headerHeight = headerRef.current.offsetHeight;
+        setChatInterfaceHeight(windowHeight - headerHeight);
+      }
+    };
+
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+
+    return () => window.removeEventListener('resize', updateHeight);
+  }, []);
+
   const handleNewChat = useCallback((newChatId: string) => {
-    // Update URL without page refresh
-    window.history.pushState({}, '', `/chat?id=${newChatId}`);
+    router.push(`/chat?id=${newChatId}`);
     fetchChatDetails(newChatId);
-  }, [fetchChatDetails]);
+  }, [router, fetchChatDetails]);
+
+  const updateChatDetails = useCallback((updater: (prevDetails: ChatDetails | null) => Partial<ChatDetails>) => {
+    setChatDetails(prevDetails => {
+      const updates = updater(prevDetails);
+      return prevDetails ? { ...prevDetails, ...updates } : null;
+    });
+  }, []);
 
   return (
     <div className="flex h-screen bg-gray-900 text-white">
-      <Sidebar />
+      <Sidebar onNewChat={handleNewChat} />
       <div className="flex-1 flex flex-col">
-        <div className="p-4 bg-gray-800">
+        <div ref={headerRef} className="p-4 bg-gray-800">
           <h1 className="text-2xl font-bold">
             {chatDetails ? chatDetails.title : 'New Chat'}
           </h1>
           {chatDetails && <p>Language: {chatDetails.language}</p>}
         </div>
-        {isLoading ? (
-          <div className="text-center mt-10">Loading...</div>
-        ) : error ? (
-          <div className="text-center mt-10 text-red-500">{error}</div>
-        ) : (
-          <ChatInterface 
-            chatDetails={chatDetails}
-            onNewChat={handleNewChat}
-          />
+        {chatInterfaceHeight && (
+          <div style={{ height: `${chatInterfaceHeight}px` }} className="flex-1 overflow-hidden">
+            {isLoading ? (
+              <div className="text-center mt-10">Loading...</div>
+            ) : error ? (
+              <div className="text-center mt-10 text-red-500">{error}</div>
+            ) : (
+              <ChatInterface 
+                chatDetails={chatDetails}
+                onNewChat={handleNewChat}
+                updateChatDetails={updateChatDetails}
+                height={chatInterfaceHeight}
+              />
+            )}
+          </div>
         )}
       </div>
     </div>

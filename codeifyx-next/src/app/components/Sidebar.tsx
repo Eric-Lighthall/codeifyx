@@ -13,7 +13,11 @@ interface RecentChat {
   updatedAt: string;
 }
 
-const Sidebar: React.FC = () => {
+interface SidebarProps {
+  onNewChat: (newChatId: string) => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ onNewChat }) => {
   const [recentChats, setRecentChats] = useState<RecentChat[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -56,6 +60,10 @@ const Sidebar: React.FC = () => {
     }
   };
 
+  const handleNewChat = () => {
+    onNewChat(''); // Pass an empty string to indicate a new chat
+  };
+
   return (
     <div className="w-64 bg-gray-800 h-full flex flex-col transition-all duration-300 hover:w-80">
       <div className="p-4">
@@ -66,10 +74,10 @@ const Sidebar: React.FC = () => {
       <div className="flex-1 overflow-y-auto">
         <div className="px-4 mt-5">
           <h4 className="text-lg font-bold mb-2 text-white">Recent Chats</h4>
-          <Link href="/chat" className="bg-gray-700 text-white rounded-lg px-4 py-2 flex items-center mb-4">
+          <button onClick={handleNewChat} className="bg-gray-700 text-white rounded-lg px-4 py-2 flex items-center mb-4 w-full">
             <span className="mr-2">+</span>
             <span>New Chat</span>
-          </Link>
+          </button>
           {isLoading ? (
             <p className="text-white">Loading chats...</p>
           ) : error ? (
