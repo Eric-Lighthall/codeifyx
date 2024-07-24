@@ -68,7 +68,7 @@ const ChatPage: React.FC = () => {
   return (
     <div className="flex h-screen bg-gray-900 text-white">
       <Sidebar onNewChat={handleNewChat} />
-      <div className="flex-1 overflow-hidden">
+      <div className="flex-1">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">Loading...</div>

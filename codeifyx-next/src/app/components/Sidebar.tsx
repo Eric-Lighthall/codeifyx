@@ -1,6 +1,3 @@
-// components/Sidebar.tsx
-"use client";
-
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -65,7 +62,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNewChat }) => {
   };
 
   return (
-    <div className="w-64 bg-gray-800 h-full flex flex-col transition-all duration-300 hover:w-80">
+    <div className="w-64 bg-gray-800 h-full flex flex-col">
       <div className="p-4">
         <Link href="/">
           <Image src="/images/codeifyxlogosmall.webp" alt="Small Logo" width={40} height={40} className="mx-auto" />
@@ -87,7 +84,7 @@ const Sidebar: React.FC<SidebarProps> = ({ onNewChat }) => {
               {recentChats.map((chat) => (
                 <li key={chat._id} className="mb-2">
                   <Link href={`/chat?id=${chat._id}`} className="flex items-center text-white hover:bg-gray-700 rounded-lg p-2">
-                    <span className="flex-1">{chat.title}</span>
+                    <span className="flex-1 truncate">{chat.title}</span>
                     <span className="text-xs text-gray-400 mr-2">{chat.language}</span>
                     <button 
                       onClick={(e) => {
