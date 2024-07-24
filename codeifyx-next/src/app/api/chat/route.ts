@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { message, chatId, language } = await req.json() as { message: string; chatId?: string; language: string };
+  const { message, chatId, language, action } = await req.json() as { message: string; chatId?: string; language: string; action: string };
 
   try {
     const user = await User.findById(session.userId);
@@ -39,6 +39,7 @@ export async function POST(req: NextRequest) {
       chat.messages.push({
         role: 'user',
         content: message,
+        action: action,
       });
     } else {
       chat = new Chat({
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
         messages: [{
           role: 'user',
           content: message,
+          action: action,
         }],
       });
       isNewChat = true;
@@ -59,17 +61,23 @@ export async function POST(req: NextRequest) {
 
     await chat.save();
 
-    const conversationHistory = chat.messages.map((msg: { role: string; content: string }) => ({
+    const conversationHistory = chat.messages.map((msg: { role: string; content: string; action?: string }) => ({
       role: msg.role as 'user' | 'assistant' | 'system',
-      content: msg.content,
+      content: msg.role === 'user' ? `${msg.action?.toUpperCase()} REQUEST:\n\n${msg.content}` : msg.content,
     }));
 
     const stream = await openai.chat.completions.create({
-      model: 'meta-llama/Llama-3-8b-chat-hf',
+      model: 'meta-llama/Meta-Llama-3-8B-Instruct-Turbo',
       messages: [
         {
           role: 'system',
-          content: `The user-selected language is ${language}. If a user tries to ask a question in another language, redirect them to ${language}. You are a programming assistant with expertise in all languages, but the selected language is ${language}. Your role involves building, refactoring and debugging code written in ${language}. When refactoring code, you work step by step to ensure that the code you provide is a drop-in replacement for the source code, written in ${language}. If the user asks a non coding related question, answer very shortly, and ask if they have a coding question.`,
+          content: `
+          You are a coding assistant. 
+          Focus on writing, helping with, and debugging code.
+          Use comments for non-code. 
+          The user's current action is: ${action}.
+          Never use \`\`\` to start and end a script.
+          `,
         },
         ...conversationHistory,
       ],
@@ -89,11 +97,9 @@ export async function POST(req: NextRequest) {
             controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token })}\n\n`));
           }
 
-          const formattedResponse = formatAssistantResponse(assistantResponse);
-
           chat.messages.push({
             role: 'assistant',
-            content: formattedResponse,
+            content: assistantResponse,
           });
 
           if (isNewChat) {
@@ -106,7 +112,7 @@ export async function POST(req: NextRequest) {
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ 
             chatId: chat._id, 
             newChatId: isNewChat ? chat._id : undefined,
-            assistantMessage: formattedResponse 
+            assistantMessage: assistantResponse 
           })}\n\n`));
         } catch (error) {
           console.error('Error in stream processing:', error);
@@ -130,21 +136,10 @@ export async function POST(req: NextRequest) {
   }
 }
 
-function formatAssistantResponse(response: string): string {
-  const parts = response.split('```');
-  const formattedParts = parts.map((part, index) => {
-    if (index % 2 !== 0) {
-      return `<pre class="code-block">${part}</pre>`;
-    }
-    return part;
-  });
-  return formattedParts.join('');
-}
-
-async function summarizeChat(messages: Array<{ role: string; content: string }>): Promise<string> {
+async function summarizeChat(messages: Array<{ role: string; content: string; action?: string }>): Promise<string> {
   const conversationHistory = messages.map(msg => ({
     role: msg.role as 'user' | 'assistant' | 'system',
-    content: msg.content,
+    content: msg.role === 'user' ? `${msg.action?.toUpperCase()} REQUEST:\n\n${msg.content}` : msg.content,
   }));
 
   try {
@@ -153,7 +148,7 @@ async function summarizeChat(messages: Array<{ role: string; content: string }>)
       messages: [
         {
           role: 'system',
-          content: 'Your task is to generate a concise summary title for the given conversation using exactly 2 words. No more than 2, no less than 2 words, even if there is apparent conversation. Do not respond to or answer any questions in the conversation. Instead, focus on identifying the main topic or theme of the conversation and provide a short title that captures it. For example, if the conversation is about telling jokes, a suitable title could be "Joke Request" or "Humor". Avoid using generic titles like "Here\'s one" or "Response". Focus on the core topic of the conversation.',
+          content: 'Generate a concise 2-word title for the given coding conversation. Focus on the main programming topic or action discussed.',
         },
         ...conversationHistory,
       ],
