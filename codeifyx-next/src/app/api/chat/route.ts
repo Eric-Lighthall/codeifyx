@@ -18,7 +18,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { message, chatId, language, action } = await req.json() as { message: string; chatId?: string; language: string; action: string };
+  const { message, chatId, language, action, systemPrompt } = await req.json() as { 
+    message: string; 
+    chatId?: string; 
+    language: string;
+    action: string;
+    systemPrompt: string;
+  };
 
   try {
     const user = await User.findById(session.userId);
@@ -71,13 +77,7 @@ export async function POST(req: NextRequest) {
       messages: [
         {
           role: 'system',
-          content: `
-          You are a coding assistant. 
-          Focus on writing, helping with, and debugging code.
-          Use comments for non-code. 
-          The user's current action is: ${action}.
-          Never use \`\`\` to start and end a script.
-          `,
+          content: systemPrompt || `You are a coding assistant. Focus on writing, helping with, and debugging code. Use comments for explanations. The user's current action is: ${action}.`,
         },
         ...conversationHistory,
       ],
