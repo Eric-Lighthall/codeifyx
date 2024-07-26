@@ -19,9 +19,14 @@ interface ChatInterfaceProps {
   updateChatDetails: (updater: (prevDetails: ChatDetails | null) => Partial<ChatDetails>) => void;
 }
 
+interface ResponsePart {
+  type: 'text' | 'code';
+  content: string;
+}
+
 const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, updateChatDetails }) => {
   const [code, setCode] = useState<string>('');
-  const [assistantCode, setAssistantCode] = useState<string>('');
+  const [assistantResponse, setAssistantResponse] = useState<ResponsePart[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [selectedAction, setSelectedAction] = useState<string>('');
   const [customInstruction, setCustomInstruction] = useState<string>('');
@@ -94,11 +99,11 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
         setCode(lastUserMessage.content);
       }
       if (lastAssistantMessage) {
-        setAssistantCode(lastAssistantMessage.content);
+        setAssistantResponse(parseResponse(lastAssistantMessage.content));
       }
     } else {
       setCode('');
-      setAssistantCode('');
+      setAssistantResponse([]);
     }
   }, [chatDetails]);
 
@@ -107,6 +112,39 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
       customInputRef.current.focus();
     }
   }, [selectedAction]);
+
+  const parseResponse = (response: string): ResponsePart[] => {
+    const parts: ResponsePart[] = [];
+    const codeRegex = /```[\s\S]*?```/g;
+    let lastIndex = 0;
+    let match;
+
+    while ((match = codeRegex.exec(response)) !== null) {
+      if (match.index > lastIndex) {
+        parts.push({ type: 'text', content: response.slice(lastIndex, match.index) });
+      }
+      parts.push({ type: 'code', content: match[0].slice(3, -3) });
+      lastIndex = match.index + match[0].length;
+    }
+
+    if (lastIndex < response.length) {
+      parts.push({ type: 'text', content: response.slice(lastIndex) });
+    }
+
+    return parts;
+  };
+
+  const renderFormattedText = (text: string) => {
+    const parts = text.split(/(\*\*.*?\*\*|\`.*?\`)/);
+    return parts.map((part, index) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={index}>{part.slice(2, -2)}</strong>;
+      } else if (part.startsWith('`') && part.endsWith('`')) {
+        return <code key={index} className={`text-[#ff79c6] bg-[#44475a] px-1 rounded`}>{part.slice(1, -1)}</code>;
+      }
+      return part;
+    });
+  };
 
   const handleAction = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -119,8 +157,8 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
     }
     setIsLoading(true);
     setError(null);
-    setAssistantCode('');
-  
+    setAssistantResponse([]);
+
     const selectedActionObj = actions.find(action => action.value === selectedAction);
     const systemPrompt = selectedActionObj?.systemPrompt || '';
     const instruction = selectedAction === 'custom' ? customInstruction : '';
@@ -132,7 +170,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
     updateChatDetails(prevDetails => ({ 
       messages: [...(prevDetails?.messages || []), userMessage]
     }));
-  
+
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -146,14 +184,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
           instruction: instruction,
         }),
       });
-    
+      
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-    
+
       const reader = response.body?.getReader();
       let assistantMessage = '';
-    
+
       while (true) {
         const { done, value } = await reader!.read();
         if (done) break;
@@ -165,7 +203,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
               const data = JSON.parse(line.slice(5));
               if (data.token) {
                 assistantMessage += data.token;
-                setAssistantCode(assistantMessage);
+                setAssistantResponse(parseResponse(assistantMessage));
               } else if (data.newChatId) {
                 handleNewChat(data.newChatId);
               }
@@ -175,7 +213,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
           }
         }
       }
-    
+
       const assistantResponseMessage: Message = {
         role: 'assistant',
         content: assistantMessage
@@ -188,24 +226,24 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
       updateChatDetails(prevDetails => ({
         messages: updatedMessages
       }));
-    
+
       await saveChatDetails({
         ...chatDetails,
         messages: updatedMessages
       } as ChatDetails);
-    
+
     } catch (error) {
       console.error('Error:', error);
       setError('An error occurred while processing your request. Please try again.');
-      setAssistantCode('Error: Unable to process the request. Please try again.');
+      setAssistantResponse([{ type: 'text', content: 'Error: Unable to process the request. Please try again.' }]);
     } finally {
       setIsLoading(false);
     }
   };
-  
+
   const handleNewChat = (newChatId: string) => {
     setCode('');
-    setAssistantCode('');
+    setAssistantResponse([]);
     setSelectedAction('');
     setCustomInstruction('');
     onNewChat(newChatId);
@@ -305,7 +343,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
         </div>
       )}
       <div className="flex-grow flex overflow-hidden">
-        <Card className="w-1/2 m-4 border-0 shadow-md bg-gray-800 flex flex-col">
+        <Card className="w-1/2 m-4 border-0 shadow-md bg-[#282A36] flex flex-col">
           <CardContent className="p-0 flex-grow overflow-hidden">
             <CodeMirror
               value={code}
@@ -317,16 +355,29 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
             />
           </CardContent>
         </Card>
-        <Card className="w-1/2 m-4 border-0 shadow-md bg-gray-800 flex flex-col">
-          <CardContent className="p-0 flex-grow overflow-hidden">
-            <CodeMirror
-              value={assistantCode}
-              height="100%"
-              theme={dracula}
-              extensions={codeMirrorOptions}
-              editable={false}
-              className="h-full"
-            />
+        <Card className="w-1/2 m-4 border-0 shadow-md bg-[#282A36] flex flex-col">
+          <CardContent className="p-0 flex-grow overflow-auto">
+            <div className="font-mono text-sm">
+              {assistantResponse.map((part, index) => (
+                <div key={index} className={part.type === 'text' ? 'bg-[#1e1f29] p-4' : 'bg-[#282A36] p-2 border-l-4 border-[#bd93f9]'}>
+                  {part.type === 'text' ? (
+                    <div className="whitespace-pre-wrap text-[#f8f8f2]">
+                      {renderFormattedText(part.content)}
+                    </div>
+                  ) : (
+                    <div className="rounded overflow-hidden">
+                      <CodeMirror
+                        value={part.content}
+                        height="auto"
+                        theme={dracula}
+                        extensions={codeMirrorOptions}
+                        editable={false}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </div>
