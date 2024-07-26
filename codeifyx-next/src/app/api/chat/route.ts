@@ -1,3 +1,5 @@
+// app/api/chat/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { connectDB } from '@/utils/db';
@@ -5,10 +7,15 @@ import User from '@/models/User';
 import Chat from '@/models/Chat';
 import { getSession } from '@/utils/session';
 
-const openai = new OpenAI({
+const client = new OpenAI({
   apiKey: process.env.TOGETHER_API_KEY,
   baseURL: 'https://api.together.xyz/v1',
 });
+
+type Message = {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+};
 
 export async function POST(req: NextRequest) {
   await connectDB();
@@ -18,12 +25,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const { message, chatId, language, action, systemPrompt } = await req.json() as { 
+  const { message, chatId, language, action, systemPrompt, instruction } = await req.json() as { 
     message: string; 
     chatId?: string; 
     language: string;
     action: string;
     systemPrompt: string;
+    instruction: string;
   };
 
   try {
@@ -42,11 +50,11 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Chat not found' }, { status: 404 });
       }
 
-      chat.messages.push({
+      // Update the user message
+      chat.messages = [{
         role: 'user',
         content: message,
-        action: action,
-      });
+      }];
     } else {
       chat = new Chat({
         user: user._id,
@@ -55,7 +63,6 @@ export async function POST(req: NextRequest) {
         messages: [{
           role: 'user',
           content: message,
-          action: action,
         }],
       });
       isNewChat = true;
@@ -67,22 +74,24 @@ export async function POST(req: NextRequest) {
 
     await chat.save();
 
-    const conversationHistory = chat.messages.map((msg: { role: string; content: string; action?: string }) => ({
-      role: msg.role as 'user' | 'assistant' | 'system',
-      content: msg.role === 'user' ? `${msg.action?.toUpperCase()} REQUEST:\n\n${msg.content}` : msg.content,
-    }));
+    // Prepare messages for AI
+    const messages: Message[] = [
+      {
+        role: 'system',
+        content: `${systemPrompt} You are a coding assistant specialized in ${language}. The user's current action is: ${action.toUpperCase()}. ${instruction ? 'Custom instruction: ' + instruction : ''}`,
+      },
+      {
+        role: 'user',
+        content: message,
+      },
+    ];
 
-    const stream = await openai.chat.completions.create({
+    const stream = await client.chat.completions.create({
       model: 'meta-llama/Meta-Llama-3-8B-Instruct-Turbo',
-      messages: [
-        {
-          role: 'system',
-          content: systemPrompt || `You are a coding assistant. Focus on writing, helping with, and debugging code. Use comments for explanations. The user's current action is: ${action}.`,
-        },
-        ...conversationHistory,
-      ],
+      messages: messages,
       max_tokens: 1024,
       stream: true,
+      temperature: 0.3,
     });
 
     const encoder = new TextEncoder();
@@ -97,13 +106,19 @@ export async function POST(req: NextRequest) {
             controller.enqueue(encoder.encode(`data: ${JSON.stringify({ token })}\n\n`));
           }
 
+          // Update the chat with the new assistant response
           chat.messages.push({
             role: 'assistant',
             content: assistantResponse,
           });
 
+          // Only keep the last two messages
+          if (chat.messages.length > 2) {
+            chat.messages = chat.messages.slice(-2);
+          }
+
           if (isNewChat) {
-            const summary = await summarizeChat(chat.messages);
+            const summary = await summarizeChat(chat.messages, action);
             chat.title = summary || `Chat ${new Date().toISOString()}`;
           }
 
@@ -136,21 +151,16 @@ export async function POST(req: NextRequest) {
   }
 }
 
-async function summarizeChat(messages: Array<{ role: string; content: string; action?: string }>): Promise<string> {
-  const conversationHistory = messages.map(msg => ({
-    role: msg.role as 'user' | 'assistant' | 'system',
-    content: msg.role === 'user' ? `${msg.action?.toUpperCase()} REQUEST:\n\n${msg.content}` : msg.content,
-  }));
-
+async function summarizeChat(messages: Message[], action: string): Promise<string> {
   try {
-    const response = await openai.chat.completions.create({
+    const response = await client.chat.completions.create({
       model: 'meta-llama/Llama-3-70b-chat-hf',
       messages: [
         {
           role: 'system',
-          content: 'Generate a concise 2-word title for the given coding conversation. Focus on the main programming topic or action discussed.',
+          content: `Generate a concise 2-word title for the given coding conversation. The conversation is about a ${action.toUpperCase()} action. Focus on the main programming topic discussed.`,
         },
-        ...conversationHistory,
+        ...messages,
       ],
       max_tokens: 4,
     });

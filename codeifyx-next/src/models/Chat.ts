@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 interface IMessage {
-  role: string;
+  role: 'user' | 'assistant';
   content: string;
 }
 
@@ -31,6 +31,7 @@ const ChatSchema: Schema = new Schema({
     {
       role: {
         type: String,
+        enum: ['user', 'assistant'],
         required: true,
       },
       content: {
@@ -40,5 +41,12 @@ const ChatSchema: Schema = new Schema({
     },
   ],
 }, { timestamps: true });
+
+ChatSchema.pre('save', function(this: IChat, next) {
+  if (this.messages.length > 2) {
+    this.messages = this.messages.slice(-2);
+  }
+  next();
+});
 
 export default mongoose.models.Chat || mongoose.model<IChat>('Chat', ChatSchema);

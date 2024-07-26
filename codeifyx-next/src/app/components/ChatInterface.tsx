@@ -1,9 +1,11 @@
 // components/ChatInterface.tsx
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Code, Bug, Zap, Lock, FileText, Play, MessageSquare, X } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { ChatDetails, Message } from '../../app/(protected)/chat/page';
 import CodeMirror from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
@@ -31,37 +33,52 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
       value: 'analyze', 
       label: 'Analyze Code', 
       icon: Code,
-      systemPrompt: "You are a code analysis expert. Analyze the given code, identify potential issues, and suggest improvements. Focus on code structure, efficiency, and best practices."
+      systemPrompt: `You are a code analysis expert. 
+      Analyze the given code, identify potential issues, and suggest improvements. 
+      Focus on code structure, efficiency, and best practices. 
+      Only respond if something is code-related.
+      No philosophical discussions.
+      If the user didn't provide any code, let them know.`
     },
     { 
       value: 'debug', 
       label: 'Debug', 
       icon: Bug,
-      systemPrompt: "You are a debugging expert. Examine the code for errors, identify the root causes of issues, and suggest fixes. Provide step-by-step explanations for your debugging process."
+      systemPrompt: `You are a debugging expert. Examine the code for any errors, identify the root causes of issues, and suggest fixes. 
+      If you find a potential bug, you should make sure it's an actual bug, and that it's not something that's not causing any problems. 
+      Make sure you do not return the same code as the user, or very similar code.`
     },
     { 
       value: 'optimize', 
       label: 'Optimize', 
       icon: Zap,
-      systemPrompt: "You are a code optimization specialist. Analyze the given code and suggest optimizations to improve performance, reduce complexity, and enhance efficiency. Explain the benefits of each optimization."
+      systemPrompt: `You are a code optimization specialist. 
+      Analyze the given code and suggest optimizations to improve performance, reduce complexity, and enhance efficiency. 
+      Explain the benefits of each optimization.
+      Only respond if something is code-related. No philosophical discussions.`
     },
     { 
       value: 'secure', 
       label: 'Security Check', 
       icon: Lock,
-      systemPrompt: "You are a cybersecurity expert. Analyze the code for potential security vulnerabilities, suggest fixes, and explain best practices for writing secure code."
+      systemPrompt: `You are a cybersecurity expert. 
+      Analyze the code for potential security vulnerabilities, suggest fixes, and explain best practices for writing secure code.
+      Only respond if something is code-related. No philosophical discussions.`
     },
     { 
       value: 'document', 
       label: 'Generate Docs', 
       icon: FileText,
-      systemPrompt: "You are a technical documentation expert. Generate clear, concise, and comprehensive documentation for the given code. Include function descriptions, parameter explanations, and usage examples."
+      systemPrompt: `You are a technical documentation expert. 
+      Generate clear, concise, and comprehensive documentation for the given code. 
+      Include function descriptions, parameter explanations, and usage examples.
+      Only respond if something is code-related. No philosophical discussions.`
     },
     { 
       value: 'custom', 
       label: 'Custom Instruction', 
       icon: MessageSquare,
-      systemPrompt: "You are a versatile coding assistant. Respond to the user's custom instruction to the best of your ability, providing detailed explanations and code examples when appropriate."
+      systemPrompt: "You are a versatile coding assistant. Follow the user's custom instruction precisely - but ONLY if it's coding related. No philosophical discussions."
     },
   ];
 
@@ -96,17 +113,21 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
     if (!selectedAction || !code.trim() || isLoading) {
       return;
     }
+    if (selectedAction === 'custom' && !customInstruction.trim()) {
+      setError('Please enter a custom instruction.');
+      return;
+    }
     setIsLoading(true);
     setError(null);
     setAssistantCode('');
   
     const selectedActionObj = actions.find(action => action.value === selectedAction);
-    const instruction = selectedAction === 'custom' ? customInstruction : `${selectedAction.toUpperCase()} REQUEST`;
     const systemPrompt = selectedActionObj?.systemPrompt || '';
+    const instruction = selectedAction === 'custom' ? customInstruction : '';
   
     const userMessage: Message = { 
       role: 'user', 
-      content: `${instruction}:\n\n${code}`
+      content: code
     };
     updateChatDetails(prevDetails => ({ 
       messages: [...(prevDetails?.messages || []), userMessage]
@@ -117,21 +138,22 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: userMessage.content,
+          message: code,
           chatId: chatDetails?.id,
           language: chatDetails?.language || 'JavaScript',
           action: selectedAction,
           systemPrompt: systemPrompt,
+          instruction: instruction,
         }),
       });
-  
+    
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
-  
+    
       const reader = response.body?.getReader();
       let assistantMessage = '';
-  
+    
       while (true) {
         const { done, value } = await reader!.read();
         if (done) break;
@@ -143,7 +165,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
               const data = JSON.parse(line.slice(5));
               if (data.token) {
                 assistantMessage += data.token;
-                setAssistantCode(assistantMessage); // Update with the full message so far
+                setAssistantCode(assistantMessage);
               } else if (data.newChatId) {
                 handleNewChat(data.newChatId);
               }
@@ -153,7 +175,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
           }
         }
       }
-  
+    
       const assistantResponseMessage: Message = {
         role: 'assistant',
         content: assistantMessage
@@ -166,12 +188,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
       updateChatDetails(prevDetails => ({
         messages: updatedMessages
       }));
-  
+    
       await saveChatDetails({
         ...chatDetails,
         messages: updatedMessages
       } as ChatDetails);
-  
+    
     } catch (error) {
       console.error('Error:', error);
       setError('An error occurred while processing your request. Please try again.');
@@ -179,6 +201,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
     } finally {
       setIsLoading(false);
     }
+  };
+  
+  const handleNewChat = (newChatId: string) => {
+    setCode('');
+    setAssistantCode('');
+    setSelectedAction('');
+    setCustomInstruction('');
+    onNewChat(newChatId);
   };
 
   const saveChatDetails = async (details: ChatDetails) => {
@@ -199,19 +229,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
       console.error('Error saving chat details:', error);
       setError('Failed to save chat details. Your changes may not persist.');
     }
-  };
-
-  const handleNewChat = (newChatId: string) => {
-    setCode('');
-    setAssistantCode('');
-    setSelectedAction('');
-    setCustomInstruction('');
-    onNewChat(newChatId);
-  };
-
-  const clearCustomInstruction = () => {
-    setSelectedAction('');
-    setCustomInstruction('');
   };
 
   const codeMirrorOptions = [
@@ -237,7 +254,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
       <div className="flex items-center p-4 space-x-4 bg-gray-800">
         {selectedAction === 'custom' ? (
           <div className="flex-1 flex items-center space-x-2 bg-gray-700 rounded px-3 py-2">
-            <input
+            <Input
               ref={customInputRef}
               type="text"
               value={customInstruction}
@@ -246,7 +263,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
               className="flex-1 bg-transparent text-white focus:outline-none"
             />
             <Button
-              onClick={clearCustomInstruction}
+              onClick={() => {
+                setSelectedAction('');
+                setCustomInstruction('');
+              }}
               variant="ghost"
               size="icon"
               className="h-5 w-5 text-gray-400 hover:text-white"
@@ -274,7 +294,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
         <Button
           onClick={handleAction}
           className="bg-blue-600 hover:bg-blue-700 text-white flex items-center px-6"
-          disabled={isLoading || !selectedAction || (selectedAction === 'custom' && !customInstruction) || !code.trim()}
+          disabled={isLoading || !selectedAction || (selectedAction === 'custom' && !customInstruction.trim()) || !code.trim()}
         >
           <Play className="mr-2 h-4 w-4" /> {isLoading ? 'Processing...' : 'Go'}
         </Button>
@@ -291,19 +311,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
               value={code}
               height="100%"
               theme={dracula}
-              extensions={[
-                javascript({ jsx: true }),
-                lineNumbers(),
-                EditorView.lineWrapping,
-                EditorView.theme({
-                  "&": {
-                    height: "100%",
-                  },
-                  ".cm-scroller": {
-                    overflow: "auto",
-                  },
-                })
-              ]}
+              extensions={codeMirrorOptions}
               onChange={(value) => setCode(value)}
               className="h-full"
             />
@@ -315,19 +323,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ chatDetails, onNewChat, u
               value={assistantCode}
               height="100%"
               theme={dracula}
-              extensions={[
-                javascript({ jsx: true }),
-                lineNumbers(),
-                EditorView.lineWrapping,
-                EditorView.theme({
-                  "&": {
-                    height: "100%",
-                  },
-                  ".cm-scroller": {
-                    overflow: "auto",
-                  },
-                })
-              ]}
+              extensions={codeMirrorOptions}
               editable={false}
               className="h-full"
             />
