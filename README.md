@@ -6,7 +6,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/Eric-Lighthall/codeifyx">
-    <img src="public/images/cflogobg.webp" alt="Logo" width="80" height="80">
+    <img src="codeifyx-next/public/images/cflogobg.webp" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">Codeifyx</h3>
